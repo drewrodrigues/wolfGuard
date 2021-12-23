@@ -1,0 +1,13 @@
+-- CreateTable
+CREATE TABLE "Bar" (
+    "id" SERIAL NOT NULL,
+    "time" TIMESTAMP(3) NOT NULL,
+    "open" DOUBLE PRECISION NOT NULL,
+    "high" DOUBLE PRECISION NOT NULL,
+    "low" DOUBLE PRECISION NOT NULL,
+    "close" DOUBLE PRECISION NOT NULL,
+    "volume" DOUBLE PRECISION NOT NULL,
+    "count" DOUBLE PRECISION NOT NULL,
+
+    CONSTRAINT "Bar_pkey" PRIMARY KEY ("id")
+);

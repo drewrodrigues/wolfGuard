@@ -1,0 +1,20 @@
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://drew:password@localhost:5432/smarttraderdev?schema=public"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Bar {
+  id     Int      @id @default(autoincrement())
+  type   String
+  time   DateTime
+  open   Float
+  high   Float
+  low    Float
+  close  Float
+  volume Float
+  count  Float
+}
