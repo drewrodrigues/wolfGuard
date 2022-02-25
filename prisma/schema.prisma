@@ -9,6 +9,7 @@ generator client {
 
 model Bar {
   id     Int      @id @default(autoincrement())
+  symbol String
   type   String
   time   DateTime
   open   Float
