@@ -17,5 +17,6 @@ model Bar {
   low    Float
   close  Float
   volume Float
-  count  Float
+
+  @@unique([symbol, time, type])
 }
