@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "prettier": "^2.5.1"
+  },
+  "scripts": {
+    "format:server": "prettier --write server/**/*.ts*"
   }
 }
