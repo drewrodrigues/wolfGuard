@@ -8,15 +8,16 @@ generator client {
 }
 
 model Bar {
-  id     Int      @id @default(autoincrement())
-  symbol String
-  type   String
-  time   DateTime
-  open   Float
-  high   Float
-  low    Float
-  close  Float
-  volume Float
+  id       Int      @id @default(autoincrement())
+  symbol   String
+  type     String
+  time     DateTime
+  open     Float
+  high     Float
+  low      Float
+  close    Float
+  volume   Float
+  exchange String
 
   @@unique([symbol, time, type])
 }
