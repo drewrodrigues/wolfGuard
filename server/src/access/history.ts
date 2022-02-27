@@ -42,7 +42,8 @@ export async function getHistoricalData(contract: Contract): Promise<any[]> {
             low,
             close,
             volume,
-            type: BarSizeSetting.MINUTES_ONE
+            type: BarSizeSetting.MINUTES_ONE,
+            exchange: contract.exchange!
           }
           console.log('Pushing bar: ', newBar)
           bars.push(newBar)
