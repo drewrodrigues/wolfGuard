@@ -4,14 +4,18 @@ import { db } from '../access/db'
 import { getHistoricalData } from '../access/history'
 const router = express.Router()
 
-router.get('/:symbol', async (req, res) => {
+router.post('/:symbol', async (req, res) => {
   const contract: Contract = {
     symbol: req.params.symbol, // should be MSFT for now
     exchange: req.body.exchange,
     currency: 'USD',
     secType: SecType.STK
   }
+  console.log({ contract })
   try {
+    if (!contract.symbol || !contract.exchange) {
+      throw new Error('No symbol or exchange specified')
+    }
     const bars = await getHistoricalData(contract)
     console.log('saving bars')
     db.bar

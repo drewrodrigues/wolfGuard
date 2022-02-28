@@ -7,7 +7,10 @@ export function BarsCache() {
   const [exchange, setExchange] = useState('SMART')
 
   function onCache() {
-    _useRequest.call(`/barsCache/${symbol}`, { data: { exchange } })
+    _useRequest.call(`/barsCache/${symbol}`, {
+      data: { exchange },
+      method: 'POST'
+    })
   }
 
   return (
