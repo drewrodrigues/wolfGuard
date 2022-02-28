@@ -1,19 +1,38 @@
-import IBApi, { EventName } from "@stoqey/ib";
+import IBApi, { EventName } from '@stoqey/ib'
 
-let ib: IBApi;
+const logFunction = (functionName: string) => {
+  console.log(`${functionName}()`)
+  return (log: string) => {
+    console.log(`${functionName}(): ${log}`)
+  }
+}
+
+let ib: IBApi
 
 export function initConnection(): Promise<IBApi> {
   return new Promise((resolve, reject) => {
-    console.log('initConnection');
-    ib = new IBApi({
-      port: 7497,
-    });
-    ib.connect();
-    ib.once(EventName.connected, () => {
-      resolve(ib);
-    });
-    ib.once(EventName.disconnected, () => {
-      reject('Not connected');
-    });
+    const logFn = logFunction('initConnection')
+    if (ib) {
+      logFn('Removing all listeners.')
+      ib.removeAllListeners()
+    }
+
+    if (!ib?.isConnected) {
+      logFn('Not connected. Connecting.')
+      ib = new IBApi({
+        port: 7497
+      })
+      ib.once(EventName.connected, () => {
+        logFn('Connected')
+        resolve(ib)
+      })
+      ib.once(EventName.disconnected, () => {
+        reject('Not connected')
+      })
+      ib.connect()
+    } else {
+      logFn('Is connected.')
+      resolve(ib)
+    }
   })
 }
