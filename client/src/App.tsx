@@ -21,6 +21,14 @@ function App() {
               Symbols
             </NavLink>
             <NavLink
+              to="/strategy"
+              className={(props) =>
+                props.isActive ? 'underline ml-[10px]' : 'ml-[10px]'
+              }
+            >
+              Strategy
+            </NavLink>
+            <NavLink
               to="/cache"
               className={(props) =>
                 props.isActive ? 'underline ml-[10px]' : 'ml-[10px]'

@@ -19,7 +19,7 @@ router.post('/:symbol', async (req, res) => {
     const bars = await getHistoricalData(contract)
     console.log('saving bars')
     db.bar
-      .createMany({ data: bars })
+      .createMany({ data: bars, skipDuplicates: true })
       .then(() => {
         console.log('bars saved')
       })
