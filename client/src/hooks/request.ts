@@ -38,7 +38,7 @@ type useRequestType<T> =
   | useRequestFail
 
 export function useRequest<T>(): useRequestType<T> & {
-  call: (url: string, config?: AxiosRequestConfig) => Promise<void>
+  call: (url: string, config?: AxiosRequestConfig) => Promise<T>
 } {
   const [state, setState] = useState<useRequestType<T>>(useRequestNoneValue)
 
@@ -55,6 +55,7 @@ export function useRequest<T>(): useRequestType<T> & {
         requestStatus: 'success'
       }
       setState(useRequestSuccessValue)
+      return response.data as T
     } catch (e) {
       const useRequestFailValue: useRequestFail = {
         error: e as string,
@@ -66,5 +67,7 @@ export function useRequest<T>(): useRequestType<T> & {
     }
   }
 
-  return { ...state, call }
+  return { ...state, call } as useRequestType<T> & {
+    call: (url: string, config?: AxiosRequestConfig) => Promise<T>
+  }
 }

@@ -6,8 +6,6 @@ router.post('/', async (req, res) => {
   try {
     const { symbol, orbBuyDuration, smaSellDuration, lotSize } = req.body
 
-    console.log('body: ', req.body)
-
     if (!symbol || !orbBuyDuration || !smaSellDuration || !lotSize) {
       throw new Error('Require params are missing')
     }
@@ -19,9 +17,19 @@ router.post('/', async (req, res) => {
       lotSize
     })
 
-    console.log('runStrategy done')
+    const strategyResponse = {
+      ...strategyResult,
+      ...{
+        setup: {
+          symbol,
+          orbBuyDuration,
+          smaSellDuration,
+          lotSize
+        }
+      }
+    }
 
-    res.send({ strategyResult })
+    res.send(strategyResponse)
   } catch (e) {
     res.status(500).send(e)
   }

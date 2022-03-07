@@ -53,12 +53,17 @@ export async function getHistoricalData(contract: Contract): Promise<any[]> {
       }
     )
 
+    console.log('Requesting historical data')
     // "20211223 00:00:00",
+    // '20210101 00:00:00',
+    // '20210201 00:00:00',
+    // TODO make these configurable
     ib.reqHistoricalData(
       requestId,
       contract,
-      '20210101 00:00:00',
-      '5 D',
+      '20220210 00:00:00',
+      // '30 D',
+      '100 D',
       BarSizeSetting.MINUTES_ONE,
       'BID', // midpoint?
       1,

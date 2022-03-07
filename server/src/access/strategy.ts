@@ -67,11 +67,6 @@ function smaDropSellStrategy(
 
     const previousSma = previousSmas[previousSmas.length - 1]
 
-    console.log({ barsBefore })
-    console.log({ barCloses })
-    console.log({ currentSma })
-    console.log({ previousSma })
-
     if (previousSma > currentSma && i >= sellIndexStart) {
       // sma has dropped, we need to sell
       return { bar: bars[i], value: bars[i].open * lotSize, type: 'sma-drop' }
@@ -105,6 +100,12 @@ export async function runStrategy(options: {
   let losingTrades = 0
   let nonTradingDays = 0
   let tradingDays = 0
+  let biggestLoss = 0
+  let biggestWin = 0
+
+  // to calculate average position size
+  let totalBuyInPositionValues = 0
+
   const sellTypes: Record<'close-out' | 'sma-drop', number> = {
     'close-out': 0,
     'sma-drop': 0
@@ -128,6 +129,8 @@ export async function runStrategy(options: {
     )
 
     if (buyOrder) {
+      totalBuyInPositionValues += buyOrder.value
+
       tradingDays++
       const sellOrder = smaDropSellStrategy(
         bars,
@@ -140,6 +143,14 @@ export async function runStrategy(options: {
       const end = moment(sellOrder.bar.time)
 
       const difference = sellOrder.value - buyOrder.value
+
+      if (difference > biggestWin) {
+        biggestWin = difference
+      }
+
+      if (difference < biggestLoss) {
+        biggestLoss = difference
+      }
 
       if (difference < 0) {
         losingTrades++
@@ -170,7 +181,10 @@ export async function runStrategy(options: {
     nonTradingDays,
     successRate: winningTrades / tradingDays,
     daysTradedRate: tradingDays / (tradingDays + nonTradingDays),
-    sellTypes
+    sellTypes,
+    biggestWin,
+    biggestLoss,
+    averagePosition: totalBuyInPositionValues / tradingDays // ! update when supporting multiple trades
   }
 
   return { orders, overallSummary }

@@ -29,7 +29,7 @@ router.post('/:symbol', async (req, res) => {
       })
     console.log('after bars')
     res.send({ bars })
-  } catch (e) {
+  } catch (e: any) {
     console.error(e)
     console.error('Oh noes')
     res.status(500).send(e)
