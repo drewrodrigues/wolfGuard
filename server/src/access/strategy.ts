@@ -1,28 +1,8 @@
 import { Bar } from '@prisma/client'
 import moment from 'moment'
+import { RunStrategyBuyOptions, RunStrategySellOptions } from '../../../common'
 import { barsByDay } from '../utils/bars'
 import { db } from './db'
-
-interface BuyConditionOrb {
-  orbDuration: number
-}
-
-interface RunStrategyBuyOptions {
-  buyCondition: BuyConditionOrb
-}
-
-interface SellConditionSMADrop {
-  smaDuration: number
-}
-
-interface RunStrategySellOptions {
-  sellCondition: SellConditionSMADrop
-}
-
-interface RunStrategyReturn {
-  // orderPairs: []
-  _barsByDay: any[]
-}
 
 // ORB will only go toward long for now for simplicity
 function orbBuyStrategy(
@@ -55,10 +35,7 @@ function smaDropSellStrategy(
   sellIndexStart: number,
   lotSize: number
 ): { bar: Bar; value: number; type: 'sma-drop' | 'close-out' } {
-  console.log('smaDropSellStrategy')
   const previousSmas: number[] = []
-
-  console.log({ duration, barsLength: bars.length })
 
   for (let i = duration; i < bars.length; i++) {
     const barsBefore = bars.slice(i - duration, duration)
@@ -84,14 +61,22 @@ function smaDropSellStrategy(
   }
 }
 
+const BARS_IN_DAY = 390
+// 390 bars in a day
 // TODO add support for multiple buy/sells each day
 export async function runStrategy(options: {
   buyOptions: RunStrategyBuyOptions
   sellOptions: RunStrategySellOptions
   symbol: string
   lotSize: number
+  nLastTradingDays: number
 }): Promise<any> {
-  const bars = await db.bar.findMany({ where: { symbol: options.symbol } })
+  const barCount = options.nLastTradingDays * BARS_IN_DAY
+  const bars = await db.bar.findMany({
+    where: { symbol: options.symbol },
+    orderBy: { time: 'desc' },
+    take: barCount
+  })
   const _barsByDay = barsByDay(bars)
 
   // computed

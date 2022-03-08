@@ -1,44 +1,27 @@
+import classNames from 'classnames'
 import React, { useEffect, useState } from 'react'
+import { IStrategyResponse } from '../../../common'
 import { useRequest } from '../hooks/request'
 import { StrategyResponse } from './strategyResponse'
 
-export interface IStrategyResponse {
-  overallSummary: {
-    value: number
-    winningTrades: number
-    losingTrades: number
-    tradingDays: number
-    nonTradingDays: number
-    daysTradedRate: number
-    sellTypes: { 'close-out': number; 'sma-drop': number }
-    successRate: number
-    biggestWin: number
-    biggestLoss: number
-    averagePosition: number
-  }
-  setup: {
-    symbol: number
-    orbBuyDuration: number
-    smaSellDuration: number
-    lotSize: number
-  }
-  orders: object[]
-}
-
 const ORB_BUY_DURATIONS = [1, 5, 10, 15, 30]
 const SMA_SELL_DROP_DURATIONS = [3, 4, 5, 10, 20, 30, 60]
+const WITHIN_LAST_N_TRADING_DAYS = [7, 15, 30, 60, 90, 180, 365, 500, 1000]
 
 export function Strategy() {
   const requestSymbols = useRequest<{ symbol: string }[]>()
   const runStrategy = useRequest<IStrategyResponse>()
 
-  const [results, setResults] = useState<IStrategyResponse[]>([])
+  const [results, setResults] = useState<IStrategyResponse>([])
 
   const [symbol, setSymbol] = useState<string>('MSFT')
   // TODO implement
   const [sellBeforeClose, setSellBeforeClose] = useState<number>(30)
 
   const [orbBuyDuration, setOrbBuyDuration] = useState(1)
+  const [nLastTradingDays, setNLastTradingDays] = useState(
+    WITHIN_LAST_N_TRADING_DAYS[0]
+  )
   const [smaSellDropDuration, setSellSmaDropDuration] = useState(3)
 
   useEffect(() => {
@@ -47,36 +30,17 @@ export function Strategy() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  async function onRunStrategy() {
+  async function onRunAllCombinations() {
+    setResults([])
+
     const strategyRun = await runStrategy.call('/strategy', {
       method: 'POST',
       data: {
         symbol,
-        orbBuyDuration,
-        smaSellDuration: smaSellDropDuration,
         lotSize: 100
       }
     })
-    setResults((p) => [...p, strategyRun])
-    console.log({ strategyRun })
-  }
-
-  async function onRunAllCombinations() {
-    ORB_BUY_DURATIONS.forEach((orbBuy) => {
-      SMA_SELL_DROP_DURATIONS.forEach(async (smaSell) => {
-        const strategyRun = await runStrategy.call('/strategy', {
-          method: 'POST',
-          data: {
-            symbol,
-            orbBuyDuration: orbBuy,
-            smaSellDuration: smaSell,
-            lotSize: 100
-          }
-        })
-        setResults((p) => [strategyRun, ...p])
-        console.log({ strategyRun })
-      })
-    })
+    setResults(strategyRun)
   }
 
   return (
@@ -91,15 +55,9 @@ export function Strategy() {
           value={orbBuyDuration}
           onChange={(e) => setOrbBuyDuration(parseInt(e.target.value))}
         >
-          <option value={1}>1 MIN ORB</option>
-          <option value={5}>5 MIN ORB</option>
-          <option value={10}>10 MIN ORB</option>
-          <option value={15}>15 MIN ORB</option>
-          <option value={30}>30 MIN ORB</option>
-          <option value={60}>60 MIN ORB</option>
-          <option value={90}>90 MIN ORB</option>
-          <option value={120}>120 MIN ORB</option>
-          <option value={180}>180 MIN ORB</option>
+          {ORB_BUY_DURATIONS.map((ORB_BUY) => (
+            <option value={ORB_BUY}>{ORB_BUY} MIN ORB</option>
+          ))}
         </select>
       </section>
 
@@ -111,15 +69,9 @@ export function Strategy() {
           value={smaSellDropDuration}
           onChange={(e) => setSellSmaDropDuration(parseInt(e.target.value))}
         >
-          <option value={3}>3 MIN SMA DROP</option>
-          <option value={4}>4 MIN SMA DROP</option>
-          <option value={5}>5 MIN SMA DROP</option>
-          <option value={10}>10 MIN SMA DROP</option>
-          <option value={20}>20 MIN SMA DROP</option>
-          <option value={30}>30 MIN SMA DROP</option>
-          <option value={60}>60 MIN SMA DROP</option>
-          <option value={90}>90 MIN SMA DROP</option>
-          <option value={120}>120 MIN SMA DROP</option>
+          {SMA_SELL_DROP_DURATIONS.map((SMA_SELL_DROP) => (
+            <option value={SMA_SELL_DROP}>{SMA_SELL_DROP} MIN SMA DROP</option>
+          ))}
         </select>
 
         <label className="flex items-center mt-[10px]">
@@ -162,25 +114,42 @@ export function Strategy() {
         )}
       </section>
 
-      <button
-        className="bg-green-300 p-[10px] rounded-[10px] mb-[10px] mr-[5px]"
-        onClick={onRunStrategy}
-      >
-        Run It
-      </button>
+      <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px]">
+        <h3 className="text-[20px]">Options</h3>
+
+        <label>
+          <select
+            className="border mr-[10px]"
+            onChange={(e) => setNLastTradingDays(parseInt(e.target.value))}
+            value={nLastTradingDays}
+          >
+            {WITHIN_LAST_N_TRADING_DAYS.map((N_TRADING_DAYS) => (
+              <option value={N_TRADING_DAYS}>{N_TRADING_DAYS}</option>
+            ))}
+          </select>
+          last trading days
+        </label>
+      </section>
 
       <button
-        className="bg-green-300 p-[10px] rounded-[10px] mb-[10px]"
+        className={classNames({
+          'bg-green-300 p-[10px] rounded-[10px] mb-[10px]':
+            runStrategy.requestStatus !== 'in-progress',
+          'bg-gray-300 p-[10px] rounded-[10px] mb-[10px]':
+            runStrategy.requestStatus === 'in-progress'
+        })}
         onClick={onRunAllCombinations}
       >
-        Run All Combinations
+        {runStrategy.requestStatus === 'in-progress'
+          ? 'Running All Combination...'
+          : 'Run All Combinations'}
       </button>
 
       <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px]">
         <h3 className="text-[20px]">Results</h3>
 
         {results.map((result) => (
-          <StrategyResponse strategy={result} />
+          <StrategyResponse strategies={result} />
         ))}
       </section>
     </>

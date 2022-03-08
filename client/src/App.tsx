@@ -5,7 +5,7 @@ import { Router } from './components/router'
 function App() {
   return (
     <BrowserRouter>
-      <div className="max-w-screen-md m-auto">
+      <div>
         <nav className="flex justify-between items-center">
           <main className="mb-[20px]">
             <Link to="/" className="font-bold">
