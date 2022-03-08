@@ -47,54 +47,77 @@ export function Strategy() {
     <>
       <h1 className="text-[28px] font-bold">Stategy</h1>
 
-      <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px]">
-        <h3 className="text-[20px]">Buy</h3>
+      {false && (
+        <>
+          <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px]">
+            <h3 className="text-[20px]">Buy</h3>
 
-        <select
-          className="border"
-          value={orbBuyDuration}
-          onChange={(e) => setOrbBuyDuration(parseInt(e.target.value))}
-        >
-          {ORB_BUY_DURATIONS.map((ORB_BUY) => (
-            <option value={ORB_BUY}>{ORB_BUY} MIN ORB</option>
-          ))}
-        </select>
-      </section>
-
-      <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px] flex flex-col">
-        <h3 className="text-[20px]">Sell</h3>
-
-        <select
-          className="border"
-          value={smaSellDropDuration}
-          onChange={(e) => setSellSmaDropDuration(parseInt(e.target.value))}
-        >
-          {SMA_SELL_DROP_DURATIONS.map((SMA_SELL_DROP) => (
-            <option value={SMA_SELL_DROP}>{SMA_SELL_DROP} MIN SMA DROP</option>
-          ))}
-        </select>
-
-        <label className="flex items-center mt-[10px]">
-          <p>
-            Sell
             <select
-              className="border mx-[5px]"
-              onChange={(e) => setSellBeforeClose(parseInt(e.target.value))}
+              className="border"
+              value={orbBuyDuration}
+              onChange={(e) => setOrbBuyDuration(parseInt(e.target.value))}
             >
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="30">30</option>
-              <option value="40">40</option>
-              <option value="50">50</option>
-              <option value="60">60</option>
+              {ORB_BUY_DURATIONS.map((ORB_BUY) => (
+                <option value={ORB_BUY}>{ORB_BUY} MIN ORB</option>
+              ))}
             </select>
-            minutes before trading day close
-          </p>
-        </label>
-        <small className="text-[10px] text-gray-400">
-          Only if sell condition has not been hit
-        </small>
-      </section>
+          </section>
+
+          <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px] flex flex-col">
+            <h3 className="text-[20px]">Sell</h3>
+
+            <select
+              className="border"
+              value={smaSellDropDuration}
+              onChange={(e) => setSellSmaDropDuration(parseInt(e.target.value))}
+            >
+              {SMA_SELL_DROP_DURATIONS.map((SMA_SELL_DROP) => (
+                <option value={SMA_SELL_DROP}>
+                  {SMA_SELL_DROP} MIN SMA DROP
+                </option>
+              ))}
+            </select>
+
+            <label className="flex items-center mt-[10px]">
+              <p>
+                Sell
+                <select
+                  className="border mx-[5px]"
+                  onChange={(e) => setSellBeforeClose(parseInt(e.target.value))}
+                >
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="30">30</option>
+                  <option value="40">40</option>
+                  <option value="50">50</option>
+                  <option value="60">60</option>
+                </select>
+                minutes before trading day close
+              </p>
+            </label>
+            <small className="text-[10px] text-gray-400">
+              Only if sell condition has not been hit
+            </small>
+          </section>
+
+          <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px]">
+            <h3 className="text-[20px]">Options</h3>
+
+            <label>
+              <select
+                className="border mr-[10px]"
+                onChange={(e) => setNLastTradingDays(parseInt(e.target.value))}
+                value={nLastTradingDays}
+              >
+                {WITHIN_LAST_N_TRADING_DAYS.map((N_TRADING_DAYS) => (
+                  <option value={N_TRADING_DAYS}>{N_TRADING_DAYS}</option>
+                ))}
+              </select>
+              last trading days
+            </label>
+          </section>
+        </>
+      )}
 
       <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px]">
         <h3 className="text-[20px]">Selection</h3>
@@ -112,23 +135,6 @@ export function Strategy() {
         ) : (
           'Loading...'
         )}
-      </section>
-
-      <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px]">
-        <h3 className="text-[20px]">Options</h3>
-
-        <label>
-          <select
-            className="border mr-[10px]"
-            onChange={(e) => setNLastTradingDays(parseInt(e.target.value))}
-            value={nLastTradingDays}
-          >
-            {WITHIN_LAST_N_TRADING_DAYS.map((N_TRADING_DAYS) => (
-              <option value={N_TRADING_DAYS}>{N_TRADING_DAYS}</option>
-            ))}
-          </select>
-          last trading days
-        </label>
       </section>
 
       <button
