@@ -1,47 +1,14 @@
-import { Bar } from '@prisma/client'
 import moment from 'moment'
 import {
   IOrder,
   IOrderSummary,
-  ISellOrder,
   RunStrategyBuyOptions,
   RunStrategySellOptions
 } from '../../../common'
 import { barsByDay } from '../utils/bars'
 import { db } from './db'
 import { buyStrategyOrbLong } from './strategy/buyStrategyOrbLong'
-
-function smaDropSellStrategy(
-  bars: Bar[],
-  duration: number,
-  sellIndexStart: number,
-  lotSize: number
-): ISellOrder {
-  const previousSmas: number[] = []
-
-  for (let i = duration; i < bars.length; i++) {
-    const barsBefore = bars.slice(i - duration, duration)
-    const barCloses = barsBefore.map((bar) => bar.close)
-    const currentSma = barCloses.reduce((val, total) => val + total, 0)
-
-    const previousSma = previousSmas[previousSmas.length - 1]
-
-    if (previousSma > currentSma && i >= sellIndexStart) {
-      // sma has dropped, we need to sell
-      return { bar: bars[i], value: bars[i].open * lotSize, type: 'sma-drop' }
-    } else {
-      previousSmas.push(currentSma)
-    }
-  }
-
-  // sell 30 minutes before close
-  const closingBar = bars[bars.length - 31]
-  return {
-    bar: closingBar,
-    value: closingBar.open * lotSize,
-    type: 'close-out'
-  }
-}
+import { sellStrategySmaDrop } from './strategy/sellStrategySmaDrop'
 
 const BARS_IN_DAY = 390
 // 390 bars in a day
@@ -92,7 +59,7 @@ export async function runStrategy(options: {
       totalBuyInPositionValues += buyOrder.value
 
       tradingDays++
-      const sellOrder = smaDropSellStrategy(
+      const sellOrder = sellStrategySmaDrop(
         bars,
         options.sellOptions.sellCondition.smaDuration,
         buyOrder.buyBarIndex,
