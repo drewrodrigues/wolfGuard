@@ -1,26 +1,51 @@
 import { Bar } from '@prisma/client'
 import moment from 'moment'
-import { RunStrategyBuyOptions, RunStrategySellOptions } from '../../../common'
+import {
+  IBuyOrder,
+  IOrder,
+  IOrderSummary,
+  ISellOrder,
+  RunStrategyBuyOptions,
+  RunStrategySellOptions
+} from '../../../common'
 import { barsByDay } from '../utils/bars'
 import { db } from './db'
 
 // ORB will only go toward long for now for simplicity
-function orbBuyStrategy(
+// with a buy at the open after a ORB breakout
+export function orbBuyStrategy(
   bars: Bar[],
   duration: number,
   lotSize: number
-): { bar: Bar; barIndex: number; orbHigh: Bar; value: number } | null {
+): IBuyOrder | null {
   const openingBars = bars.slice(0, duration)
-  const highs = openingBars.map((bar) => bar.close)
-  const orbHigh = Math.max(...highs)
+  const lows = openingBars.map((bar) => bar.low)
+  const openingRangeMin = Math.min(...lows)
+  const openingRangeLowBar = openingBars.find(
+    (bar) => bar.low === openingRangeMin
+  )
+  const highs = openingBars.map((bar) => bar.high)
+  const openingRangeMax = Math.max(...highs)
+  const openingRangeHighBar = openingBars.find(
+    (bar) => bar.high === openingRangeMax
+  )
+  if (!openingRangeHighBar) throw new Error('No opening range high bar found')
+  if (!openingRangeLowBar) throw new Error('No opening range low bar found')
 
   for (let i = duration; i < bars.length; i++) {
     const bar = bars[i]
-    if (bar.open > orbHigh) {
+    const barMaxPriceAction = Math.max(
+      ...[bar.open, bar.close, bar.high, bar.low]
+    )
+
+    if (barMaxPriceAction > openingRangeMax) {
       return {
         bar,
-        barIndex: i,
-        orbHigh: openingBars.find((bar) => bar.high === orbHigh)!,
+        buyBarIndex: i,
+        openingRange: {
+          lowBar: openingRangeLowBar,
+          highBar: openingRangeHighBar
+        },
         value: bar.open * lotSize
       }
     }
@@ -34,7 +59,7 @@ function smaDropSellStrategy(
   duration: number,
   sellIndexStart: number,
   lotSize: number
-): { bar: Bar; value: number; type: 'sma-drop' | 'close-out' } {
+): ISellOrder {
   const previousSmas: number[] = []
 
   for (let i = duration; i < bars.length; i++) {
@@ -96,14 +121,7 @@ export async function runStrategy(options: {
     'sma-drop': 0
   }
 
-  const orders: Record<
-    string,
-    {
-      buy: { bar: Bar; barIndex: number; orbHigh: Bar }
-      sell: { bar: Bar; value: number }
-      summary: object
-    } | null
-  > = {}
+  const orders: IOrder = {}
 
   for (const date in _barsByDay) {
     const bars = _barsByDay[date]
@@ -120,7 +138,7 @@ export async function runStrategy(options: {
       const sellOrder = smaDropSellStrategy(
         bars,
         options.sellOptions.sellCondition.smaDuration,
-        buyOrder.barIndex,
+        buyOrder.buyBarIndex,
         options.lotSize
       )
 
@@ -143,7 +161,7 @@ export async function runStrategy(options: {
         winningTrades++
       }
 
-      const summary = {
+      const summary: IOrderSummary = {
         difference,
         durationOpen: moment.duration(end.diff(start)).asMinutes()
       }
