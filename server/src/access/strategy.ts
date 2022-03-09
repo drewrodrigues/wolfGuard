@@ -34,6 +34,11 @@ export function orbBuyStrategy(
 
   for (let i = duration; i < bars.length; i++) {
     const bar = bars[i]
+
+    // ! this should be changed... Technically, if the `high`
+    // ! exceeds the opening range's high, then we shouldn't be
+    // ! buying at the bar open (because there might be a large gap here)
+    // ? how could we improve this? Trying to buy at the open/close/high/low instead?
     const barMaxPriceAction = Math.max(
       ...[bar.open, bar.close, bar.high, bar.low]
     )
@@ -46,7 +51,7 @@ export function orbBuyStrategy(
           lowBar: openingRangeLowBar,
           highBar: openingRangeHighBar
         },
-        value: bar.open * lotSize
+        value: bar.open * lotSize // ! this is technically not correct
       }
     }
   }
