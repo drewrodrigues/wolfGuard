@@ -1,5 +1,5 @@
 import { Bar } from '@prisma/client'
-import { orbBuyStrategy } from '../strategy'
+import { buyStrategyOrbLong } from '../../strategy/buyStrategyOrbLong'
 
 type BarRequiredPropsType = 'close' | 'open' | 'high' | 'low'
 type TestMockBar = Pick<Bar, BarRequiredPropsType>
@@ -43,7 +43,7 @@ const neutralBar: TestMockBar = {
 // and then wait until we have a bar which has a price action that
 // goes above this value. This can be the `open`, `close`, `high`, or even
 // the `low` of successive bars.
-describe('orbBuyStrategy', () => {
+describe('buyStrategyOrbLong', () => {
   describe('when 5 minute duration ORB hits', () => {
     it('returns a buy order', () => {
       const barToBuyAt: TestMockBar = {
@@ -65,7 +65,7 @@ describe('orbBuyStrategy', () => {
         neutralBar
       ]
 
-      const buyOrder = orbBuyStrategy(
+      const buyOrder = buyStrategyOrbLong(
         fiveMinuteOrb as Bar[],
         5,
         LOT_SIZE_TO_BUY
@@ -99,7 +99,7 @@ describe('orbBuyStrategy', () => {
           neutralBar,
           barToBuyAt
         ]
-        const buyOrder = orbBuyStrategy(
+        const buyOrder = buyStrategyOrbLong(
           fiveMinuteOrb as Bar[],
           5,
           LOT_SIZE_TO_BUY
@@ -131,7 +131,7 @@ describe('orbBuyStrategy', () => {
           barToBuyAt // minute 6 should be where the buy happens
         ]
 
-        const buyOrder = orbBuyStrategy(
+        const buyOrder = buyStrategyOrbLong(
           fiveMinuteOrb as Bar[],
           5,
           LOT_SIZE_TO_BUY
@@ -165,7 +165,7 @@ describe('orbBuyStrategy', () => {
           barToBuyAt
         ]
 
-        const buyOrder = orbBuyStrategy(
+        const buyOrder = buyStrategyOrbLong(
           fiveMinuteOrb as Bar[],
           5,
           LOT_SIZE_TO_BUY
@@ -195,7 +195,7 @@ describe('orbBuyStrategy', () => {
           BAR_TO_BUY_AT
         ]
 
-        const buyOrder = orbBuyStrategy(
+        const buyOrder = buyStrategyOrbLong(
           fiveMinuteOrb as Bar[],
           5,
           LOT_SIZE_TO_BUY
@@ -228,7 +228,7 @@ describe('orbBuyStrategy', () => {
         LOW_IN_OPENING_RANGE
       ]
 
-      const buyOrder = orbBuyStrategy(
+      const buyOrder = buyStrategyOrbLong(
         fiveMinuteOrb as Bar[],
         5,
         LOT_SIZE_TO_BUY
