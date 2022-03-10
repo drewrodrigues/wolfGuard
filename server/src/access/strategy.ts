@@ -1,6 +1,6 @@
 import moment from 'moment'
 import {
-  IOrder,
+  IOrders,
   IOrderSummary,
   RunStrategyBuyOptions,
   RunStrategySellOptions
@@ -46,7 +46,7 @@ export async function runStrategy(options: {
     'sma-drop': 0
   }
 
-  const orders: IOrder = {}
+  const orders: IOrders = {}
 
   for (const date in _barsByDay) {
     const bars = _barsByDay[date]

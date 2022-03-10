@@ -16,7 +16,6 @@ export function sellStrategySmaDrop(
   lotSize: number
 ): ISellOrder | null {
   const smas = _runningSmasForBars(bars, duration)
-  console.log({ smas })
 
   for (let i = Math.max(duration - 1, barBuyIndex + 1); i < bars.length; i++) {
     const previousSma = smas[i - 1]

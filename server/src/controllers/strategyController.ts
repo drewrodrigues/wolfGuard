@@ -5,7 +5,8 @@ const router = express.Router()
 
 const ORB_BUY_DURATIONS = [1, 5, 10, 15, 30]
 const SMA_SELL_DROP_DURATIONS = [3, 4, 5, 10, 20, 30, 60]
-const WITHIN_LAST_N_TRADING_DAYS = [7, 15, 30, 60, 90, 180, 365, 500, 1000]
+// ! go from 0 < 1000 and push at the below intervals
+const WITHIN_LAST_N_TRADING_DAYS = [7, 15, 30, 60, 90, 180, 365, 500, 1000] // ! we can do this in 1 loop (just push out subsections of bars as we go--from low to high)
 
 router.post('/', async (req, res) => {
   const overallRuns: IStrategyResponse = []
@@ -62,6 +63,7 @@ router.post('/', async (req, res) => {
 
     res.send(overallRuns)
   } catch (e) {
+    console.error(e)
     res.status(500).send(e)
   }
 })

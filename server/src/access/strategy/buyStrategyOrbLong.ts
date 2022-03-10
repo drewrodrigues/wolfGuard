@@ -7,7 +7,8 @@ import { IBuyOrder } from '../../../../common'
 export function buyStrategyOrbLong(
   bars: Bar[],
   duration: number,
-  lotSize: number
+  lotSize: number,
+  enterWithinNMinutes: number = 120
 ): IBuyOrder | null {
   const openingBars = bars.slice(0, duration)
   const lows = openingBars.map((bar) => bar.low)
@@ -23,7 +24,8 @@ export function buyStrategyOrbLong(
   if (!openingRangeHighBar) throw new Error('No opening range high bar found')
   if (!openingRangeLowBar) throw new Error('No opening range low bar found')
 
-  for (let i = duration; i < bars.length; i++) {
+  // TODO add as param
+  for (let i = duration; i < enterWithinNMinutes; i++) {
     const bar = bars[i]
 
     // ! this should be changed... Technically, if the `high`
@@ -47,5 +49,5 @@ export function buyStrategyOrbLong(
     }
   }
 
-  return null
+  return null // TODO add type to explain why a buy didn't occur
 }
