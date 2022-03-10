@@ -10,34 +10,35 @@ export function sellStrategySmaDrop(
   // * we have `barBuyIndex` do this so we can have a SMA setup before
   // * before a buy is actually done (so a 3 minute SMA drop
   // * might occur one the first bar we can sell)
+  // ? or do we want to allow the ability to start the sma
+  // ? after we start a buy?
   barBuyIndex: number,
   lotSize: number
 ): ISellOrder | null {
-  const previousSmas: number[] = []
   const smas = _runningSmasForBars(bars, duration)
+  console.log({ smas })
 
-  for (let i = duration; i < bars.length; i++) {
+  for (let i = Math.max(duration - 1, barBuyIndex + 1); i < bars.length; i++) {
+    const previousSma = smas[i - 1]
     const currentSma = smas[i]
-    const previousSma = previousSmas[previousSmas.length - 1]
 
-    if (!currentSma) {
-      // too early to have a sma
-    } else if (previousSma > currentSma && i > barBuyIndex) {
-      // sma has dropped, we need to sell
-      return { bar: bars[i], value: bars[i].open * lotSize, type: 'sma-drop' }
+    if (!currentSma || !previousSma) {
+      continue
+    }
+
+    const currentBar = bars[i]
+    const smaHasDropped = previousSma > currentSma
+
+    if (smaHasDropped) {
+      return {
+        bar: currentBar,
+        value: currentBar.close * lotSize,
+        type: 'sma-drop'
+      }
     }
   }
 
   return null
-
-  // TODO: pull this into another strategy (not within this one)
-  // // sell 30 minutes before close
-  // const closingBar = bars[bars.length - 31]
-  // return {
-  //   bar: closingBar,
-  //   value: closingBar.open * lotSize,
-  //   type: 'close-out'
-  // }
 }
 
 export function _runningSmasForBars(
