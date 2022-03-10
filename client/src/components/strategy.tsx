@@ -37,7 +37,7 @@ export function Strategy() {
       method: 'POST',
       data: {
         symbol,
-        lotSize: 100
+        lotSize: 1
       }
     })
     setResults(strategyRun)
