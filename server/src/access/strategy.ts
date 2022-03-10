@@ -8,10 +8,11 @@ import {
 import { barsByDay } from '../utils/bars'
 import { db } from './db'
 import { buyStrategyOrbLong } from './strategy/buyStrategyOrbLong'
+import { sellStrategyBeforeMarketClose } from './strategy/sellStrategyBeforeMarketClose'
 import { sellStrategySmaDrop } from './strategy/sellStrategySmaDrop'
 
-const BARS_IN_DAY = 390
-// 390 bars in a day
+export const BARS_IN_DAY = 390
+
 // TODO add support for multiple buy/sells each day
 export async function runStrategy(options: {
   buyOptions: RunStrategyBuyOptions
@@ -59,12 +60,21 @@ export async function runStrategy(options: {
       totalBuyInPositionValues += buyOrder.value
 
       tradingDays++
-      const sellOrder = sellStrategySmaDrop(
+      let sellOrder = sellStrategySmaDrop(
         bars,
         options.sellOptions.sellCondition.smaDuration,
         buyOrder.buyBarIndex,
         options.lotSize
       )
+
+      if (!sellOrder) {
+        sellOrder = sellStrategyBeforeMarketClose(
+          bars,
+          30,
+          buyOrder.buyBarIndex,
+          options.lotSize
+        )
+      }
 
       const start = moment(buyOrder.bar.time)
       const end = moment(sellOrder.bar.time)
