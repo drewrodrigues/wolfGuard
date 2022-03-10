@@ -8,6 +8,10 @@ import { symbolsController } from './controllers/symbolsController'
 
 const app = express()
 
+// TODO: we can put the caching middleware here based on the request body / params
+// * this is so I wouldn't have to manually adding caching for each request
+// ? also, we could add a timeout of how long until a new request is cached
+
 app.use(cors())
 app.use(express.json())
 app.use(morgan('dev'))

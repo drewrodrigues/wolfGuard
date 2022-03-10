@@ -27,6 +27,11 @@ export async function runStrategy(options: {
     orderBy: { time: 'desc' },
     take: barCount
   })
+  if (bars.length !== barCount) {
+    throw new Error(
+      `Not enough data to run strategy for n=${options.nLastTradingDays} days`
+    )
+  }
   const _barsByDay = barsByDay(bars)
 
   // computed
@@ -95,6 +100,7 @@ export async function runStrategy(options: {
         winningTrades++
       }
 
+      // TODO: pull out and test summary
       const summary: IOrderSummary = {
         difference,
         durationOpen: moment.duration(end.diff(start)).asMinutes()
@@ -122,6 +128,7 @@ export async function runStrategy(options: {
     biggestWin,
     biggestLoss,
     averagePosition: totalBuyInPositionValues / tradingDays // ! update when supporting multiple trades
+    // TODO: profit margin?
   }
 
   return { orders, overallSummary }
