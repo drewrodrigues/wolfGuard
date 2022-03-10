@@ -2,6 +2,8 @@ import moment from 'moment'
 import {
   IOrders,
   IOrderSummary,
+  IOverallSummary,
+  IRunStrategyResult,
   RunStrategyBuyOptions,
   RunStrategySellOptions
 } from '../../../common'
@@ -12,6 +14,9 @@ import { sellStrategyBeforeMarketClose } from './strategy/sellStrategyBeforeMark
 import { sellStrategySmaDrop } from './strategy/sellStrategySmaDrop'
 
 export const BARS_IN_DAY = 390
+export const WITHIN_LAST_N_TRADING_DAYS = [
+  7, 15, 30, 60, 90, 180, 365, 500, 1000
+]
 
 // TODO add support for multiple buy/sells each day
 export async function runStrategy(options: {
@@ -19,44 +24,47 @@ export async function runStrategy(options: {
   sellOptions: RunStrategySellOptions
   symbol: string
   lotSize: number
-  nLastTradingDays: number
-}): Promise<any> {
-  const barCount = options.nLastTradingDays * BARS_IN_DAY
+}): Promise<(IRunStrategyResult | null)[]> {
   const bars = await db.bar.findMany({
     where: { symbol: options.symbol },
-    orderBy: { time: 'desc' },
-    take: barCount
+    orderBy: { time: 'desc' }
   })
-  if (bars.length !== barCount) {
-    throw new Error(
-      `Not enough data to run strategy for n=${options.nLastTradingDays} days`
-    )
-  }
+
+  const strategyRunOnDay: (IRunStrategyResult | null)[] = []
   const _barsByDay = barsByDay(bars)
 
+  // TODO: re-write logic
+  // if (barQuantityToUse !== barsToUse.length) {
+  //   strategyRuns.push(null)
+  //   throw new Error(
+  //     `Not enough data to run strategy for n=${nTradingDays} days`
+  //   )
   // computed
-  let totalValue = 0
-  let winningTrades = 0
-  let losingTrades = 0
-  let nonTradingDays = 0
-  let tradingDays = 0
-  let biggestLoss = 0
-  let biggestWin = 0
+  const runningSummary = {
+    totalValue: 0,
+    winningTrades: 0,
+    losingTrades: 0,
+    nonTradingDays: 0,
+    tradingDays: 0,
+    biggestLoss: 0,
+    biggestWin: 0,
+    sellTypes: {
+      'close-out': 0,
+      'sma-drop': 0
+    }
+  }
 
   // to calculate average position size
   let totalBuyInPositionValues = 0
 
-  const sellTypes: Record<'close-out' | 'sma-drop', number> = {
-    'close-out': 0,
-    'sma-drop': 0
-  }
-
   const orders: IOrders = {}
+  let onTradingDay = 1
 
+  // at each day --
   for (const date in _barsByDay) {
-    const bars = _barsByDay[date]
+    const barsToday = _barsByDay[date]
     const buyOrder = buyStrategyOrbLong(
-      bars,
+      barsToday,
       options.buyOptions.buyCondition.orbDuration,
       options.lotSize
     )
@@ -64,9 +72,9 @@ export async function runStrategy(options: {
     if (buyOrder) {
       totalBuyInPositionValues += buyOrder.value
 
-      tradingDays++
+      runningSummary.tradingDays++
       let sellOrder = sellStrategySmaDrop(
-        bars,
+        barsToday,
         options.sellOptions.sellCondition.smaDuration,
         buyOrder.buyBarIndex,
         options.lotSize
@@ -74,7 +82,7 @@ export async function runStrategy(options: {
 
       if (!sellOrder) {
         sellOrder = sellStrategyBeforeMarketClose(
-          bars,
+          barsToday,
           30,
           buyOrder.buyBarIndex,
           options.lotSize
@@ -86,50 +94,65 @@ export async function runStrategy(options: {
 
       const difference = sellOrder.value - buyOrder.value
 
-      if (difference > biggestWin) {
-        biggestWin = difference
+      if (difference > runningSummary.biggestWin) {
+        runningSummary.biggestWin = difference
       }
 
-      if (difference < biggestLoss) {
-        biggestLoss = difference
+      if (difference < runningSummary.biggestLoss) {
+        runningSummary.biggestLoss = difference
       }
 
       if (difference < 0) {
-        losingTrades++
+        runningSummary.losingTrades++
       } else if (difference > 0) {
-        winningTrades++
+        runningSummary.winningTrades++
       }
 
       // TODO: pull out and test summary
-      const summary: IOrderSummary = {
+      const orderSummary: IOrderSummary = {
         difference,
         durationOpen: moment.duration(end.diff(start)).asMinutes()
       }
 
-      sellTypes[sellOrder.type]++
-      totalValue += difference
+      runningSummary.sellTypes[sellOrder.type]++
+      runningSummary.totalValue += difference
 
-      orders[date] = { buy: buyOrder, sell: sellOrder, summary }
+      orders[date] = { buy: buyOrder, sell: sellOrder, summary: orderSummary }
     } else {
-      nonTradingDays++
+      runningSummary.nonTradingDays++
       orders[date] = null
     }
+
+    const shouldTrackSection = WITHIN_LAST_N_TRADING_DAYS.includes(onTradingDay)
+    if (shouldTrackSection) {
+      const overallSummary: IOverallSummary = {
+        value: runningSummary.totalValue,
+        winningTrades: runningSummary.winningTrades,
+        losingTrades: runningSummary.losingTrades,
+        tradingDays: runningSummary.tradingDays,
+        nonTradingDays: runningSummary.nonTradingDays,
+        successRate: runningSummary.winningTrades / runningSummary.tradingDays,
+        daysTradedRate:
+          runningSummary.tradingDays /
+          (runningSummary.tradingDays + runningSummary.nonTradingDays),
+        sellTypes: runningSummary.sellTypes,
+        biggestWin: runningSummary.biggestWin,
+        biggestLoss: runningSummary.biggestLoss,
+        averageValuePerDay:
+          runningSummary.totalValue / runningSummary.tradingDays,
+        averagePosition: totalBuyInPositionValues / runningSummary.tradingDays // ! update when supporting multiple trades
+        // TODO: profit margin?
+      }
+      // need to do the below, otherwise they'll all point to the same reference
+      strategyRunOnDay.unshift({
+        orders: { ...orders },
+        overallSummary: { ...overallSummary },
+        nTradingDays: onTradingDay
+      })
+    }
+
+    onTradingDay++ // to keep track of sections
   }
 
-  const overallSummary = {
-    value: totalValue,
-    winningTrades,
-    losingTrades,
-    tradingDays,
-    nonTradingDays,
-    successRate: winningTrades / tradingDays,
-    daysTradedRate: tradingDays / (tradingDays + nonTradingDays),
-    sellTypes,
-    biggestWin,
-    biggestLoss,
-    averagePosition: totalBuyInPositionValues / tradingDays // ! update when supporting multiple trades
-    // TODO: profit margin?
-  }
-
-  return { orders, overallSummary }
+  return strategyRunOnDay
 }
