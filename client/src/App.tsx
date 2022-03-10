@@ -5,13 +5,11 @@ import { Router } from './components/router'
 function App() {
   return (
     <BrowserRouter>
-      <div>
-        <nav className="flex justify-between items-center">
-          <main className="mb-[20px]">
-            <Link to="/" className="font-bold">
-              SmartTrader
-            </Link>
-          </main>
+      <div className="mx-[20px]">
+        <nav className="flex justify-between items-center py-[20px]">
+          <Link to="/" className="font-bold">
+            SmartTrader
+          </Link>
 
           <aside className="text-[14px]">
             <NavLink
@@ -38,6 +36,7 @@ function App() {
             </NavLink>
           </aside>
         </nav>
+
         <Router />
       </div>
     </BrowserRouter>

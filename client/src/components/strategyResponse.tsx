@@ -12,57 +12,75 @@ interface IStrategyResponseProps {
 }
 
 export function StrategyResponse({
-  strategies: { runs, buyStrategy, sellStrategy }
+  strategies: { strategyResult, buyStrategy, sellStrategy, setup }
 }: IStrategyResponseProps) {
   return (
-    <main className="w-full">
-      <header>
-        <h2>Buy Strategy: {buyStrategy} ORB</h2>
-        <h2>Sell Strategy: {sellStrategy} SMA drop</h2>
+    <main className="w-full rounded-[5px] mb-[10px]">
+      <header className="text-[12px] flex justify-between">
+        <h2>
+          Buy Strategy: <span className="font-bold">{buyStrategy} ORB</span>
+        </h2>
+        <h2>
+          Sell Strategy:{' '}
+          <span className="font-bold">{sellStrategy} SMA drop</span>
+        </h2>
       </header>
 
-      <div className="flex flex-wrap justify-between">
-        {runs.map((run) => (
-          <div
-            className={classnames(
-              'p-[10px] rounded-[5px] mb-[10px] w-[10.5%] text-[12px]',
-              {
-                'bg-red-400 text-red-900': run.overallSummary.value < 0,
-                'bg-green-400 text-green-900': run.overallSummary.value > 0
-              }
-            )}
-          >
-            <p>Value: {dollarFormatter.format(run.overallSummary.value)}</p>
-            <p>
-              Success rate:{' '}
-              {`${(run.overallSummary.successRate * 100).toFixed(0)}%`}
-            </p>
-            <p>symbol: {run.setup.symbol}</p>
-            <p>orbBuyDuration: {run.setup.orbBuyDuration} m</p>
-            <p>smaSellDuration: {run.setup.smaSellDuration} m</p>
-            <p>lotSize: {run.setup.lotSize}</p>
-            <p>
-              biggestWin:{' '}
-              {dollarFormatter.format(run.overallSummary.biggestWin)}
-            </p>
-            <p>
-              biggestLoss:{' '}
-              {dollarFormatter.format(run.overallSummary.biggestLoss)}
-            </p>
-            <p>
-              daysTradedRate:{' '}
-              {`${(run.overallSummary.daysTradedRate * 100).toFixed(0)}%`}
-            </p>
-            <p>
-              averagePosition:{' '}
-              {dollarFormatter.format(run.overallSummary.averagePosition)}
-            </p>
-            <p>nLastTradingDays: {run.setup.nLastTradingDays}</p>
-            <p>lowestAccountBalance: ?</p>
-            <p>highestAccountBalance: ?</p>
-            <p>endingAccountBalance: ?</p>
-          </div>
-        ))}
+      <div className="flex flex-wrap justify-between mx-[-10px]">
+        {strategyResult.map((result) => {
+          if (!result) return null
+
+          return (
+            <>
+              <div
+                className={classnames(
+                  'p-[10px] rounded-[5px] mb-[10px] flex-1 text-[12px] mx-[10px] relative',
+                  {
+                    'bg-red-400 text-red-900': result.overallSummary.value < 0,
+                    'bg-green-400 text-green-900':
+                      result.overallSummary.value > 0
+                  }
+                )}
+              >
+                <p className="font-bold text-[22px]">
+                  {dollarFormatter.format(result.overallSummary.value)}
+                </p>
+                <p>
+                  {dollarFormatter.format(
+                    result.overallSummary.averageValuePerDay
+                  )}
+                </p>
+                <p>
+                  Success rate:{' '}
+                  {`${(result.overallSummary.successRate * 100).toFixed(0)}%`}
+                </p>
+                <p>
+                  biggestWin:{' '}
+                  {dollarFormatter.format(result.overallSummary.biggestWin)}
+                </p>
+                <p>
+                  biggestLoss:{' '}
+                  {dollarFormatter.format(result.overallSummary.biggestLoss)}
+                </p>
+                <p>
+                  daysTradedRate:{' '}
+                  {`${(result.overallSummary.daysTradedRate * 100).toFixed(
+                    0
+                  )}%`}
+                </p>
+                <p>
+                  averagePosition:{' '}
+                  {dollarFormatter.format(
+                    result.overallSummary.averagePosition
+                  )}
+                </p>
+                <p className="absolute top-[10px] right-[10px] text-[10px] opacity-50">
+                  Last {result.nTradingDays} days
+                </p>
+              </div>
+            </>
+          )
+        })}
       </div>
     </main>
   )

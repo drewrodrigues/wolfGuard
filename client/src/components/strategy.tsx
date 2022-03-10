@@ -151,8 +151,8 @@ export function Strategy() {
           : 'Run All Combinations'}
       </button>
 
-      <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px]">
-        <h3 className="text-[20px]">Results</h3>
+      <section className="mb-[10px]">
+        <h3 className="text-[20px] font-bold">Results</h3>
 
         {results.map((result) => (
           <StrategyResponse strategies={result} />
