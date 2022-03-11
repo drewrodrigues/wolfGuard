@@ -10,11 +10,29 @@ export async function getHistoricalData(contract: Contract): Promise<any[]> {
 
   const bars: Omit<Bar, 'id'>[] = []
   const ib = await initConnection()
-  console.log('getHistoricalData')
 
   return new Promise((resolve, reject) => {
     ib.on(EventName.error, (e) => {
+      console.log('Rejecting', e)
       reject(e)
+    })
+
+    ib.on(EventName.all, (...args) => {
+      const [message, detail] = [args[0], args[1][0]]
+      if (
+        message !== 'historicalData' &&
+        message !== 'managedAccounts' &&
+        typeof detail === 'string'
+          ? !detail.includes('data farm')
+          : true
+      ) {
+        console.log('getHistoricalData message: ', args)
+      }
+    })
+
+    ib.on(EventName.disconnected, (...message) => {
+      console.log('getHistoricalData disconnected: ', message)
+      reject(message)
     })
 
     ib.on(
