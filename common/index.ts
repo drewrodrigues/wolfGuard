@@ -56,36 +56,38 @@ export interface IOrderGroup {
 type IOrderDate = string
 export type IOrders = Record<IOrderDate, IOrderGroup | null>
 
-export interface IStrategyRun {
-  withLastNTradingDays: number
-  overallSummary: {
-    value: number
-    winningTrades: number
-    losingTrades: number
-    tradingDays: number
-    nonTradingDays: number
-    daysTradedRate: number
-    sellTypes: { 'close-out': number; 'sma-drop': number }
-    successRate: number
-    biggestWin: number
-    biggestLoss: number
-    averagePosition: number
-  }
-  setup: {
-    symbol: number
-    orbBuyDuration: number
-    smaSellDuration: number
-    lotSize: number
-    nLastTradingDays: number
-  }
+export interface IOverallSummary {
+  value: number
+  winningTrades: number
+  losingTrades: number
+  tradingDays: number
+  nonTradingDays: number
+  daysTradedRate: number
+  sellTypes: { 'close-out': number; 'sma-drop': number }
+  successRate: number
+  biggestWin: number
+  biggestLoss: number
+  averagePosition: number
+  averageValuePerDay: number
+}
+
+export interface IRunStrategyResult {
   orders: IOrders
+  overallSummary: IOverallSummary
+  nTradingDays: number
 }
 
 export interface IStrategy {
   buyStrategy: number // ! this should be a string -- which aligns with an enum
   sellStrategy: number // ! this should be a string -- which aligns with an enum
 
-  runs: IStrategyRun[]
+  strategyResult: IRunStrategyResult[]
+  setup: {
+    symbol: number
+    orbBuyDuration: number
+    smaSellDuration: number
+    lotSize: number
+  }
 }
 
 export type IStrategyResponse = IStrategy[]
