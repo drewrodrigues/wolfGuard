@@ -1,4 +1,4 @@
-import classnames from 'classnames'
+import classNames from 'classnames'
 import React from 'react'
 import { IStrategy } from '../../../common'
 
@@ -30,7 +30,7 @@ export function StrategyResponse({
         {strategyResult.map((result) => (
           <>
             <div
-              className={classnames(
+              className={classNames(
                 'p-[10px] rounded-[5px] mr-[5px] mb-[10px] flex-1 text-[12px] mx-[10px] relative',
                 {
                   'bg-red-400 text-red-900': result.overallSummary.value < 0,

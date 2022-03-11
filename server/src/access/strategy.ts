@@ -24,13 +24,13 @@ export async function runStrategy(options: {
   sellOptions: RunStrategySellOptions
   symbol: string
   lotSize: number
-}): Promise<(IRunStrategyResult | null)[]> {
+}): Promise<IRunStrategyResult[]> {
   const bars = await db.bar.findMany({
     where: { symbol: options.symbol },
     orderBy: { time: 'desc' }
   })
 
-  const strategyRunOnDay: (IRunStrategyResult | null)[] = []
+  const strategyRunOnDay: IRunStrategyResult[] = []
   const _barsByDay = barsByDay(bars)
 
   // TODO: re-write logic

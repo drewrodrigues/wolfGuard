@@ -52,8 +52,6 @@ router.post('/', async (req, res) => {
 
             const builtStrageyRun = {
               strategyResult,
-              // withLastNTradingDays: nDays,
-              withLastNTradingDays: -999,
               ...{
                 setup: {
                   symbol,

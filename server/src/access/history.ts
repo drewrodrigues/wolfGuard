@@ -77,15 +77,36 @@ export async function getHistoricalData(contract: Contract): Promise<any[]> {
     // "20211223 00:00:00",
     // '20210101 00:00:00',
     // '20210201 00:00:00',
+    // '20220210 00:00:00',
+    // const startDate = '20220101 00:00:00'
     // TODO make these configurable
+
+    const endDate = '20210101 00:00:00'
+    const durationString = '100 D'
+    const durationStringTwoYears = '2 Y'
+
+    console.log({
+      requestId,
+      contract,
+      endDate,
+      durationString,
+      barSizeSetting: BarSizeSetting.MINUTES_ONE,
+      tradeType: 'TRADES', // midpoint?
+      last: 1,
+      lastTwo: 1,
+      someFalsy: false
+    })
+
     ib.reqHistoricalData(
       requestId,
       contract,
-      '20220210 00:00:00',
-      // '30 D',
-      '100 D',
+      endDate,
+      durationStringTwoYears,
       BarSizeSetting.MINUTES_ONE,
-      'BID', // midpoint?
+      // ? need to look into what the market is traded at
+      // ? I should merge BID_ASK data into the columns to trade
+      // ? at instead of low/high spreads
+      'TRADES', // midpoint?
       1,
       1,
       false
