@@ -5,7 +5,9 @@ import { barTimeToSavableFormat } from '../utils/date'
 import { initConnection } from './ib'
 
 export async function getHistoricalData(contract: Contract): Promise<any[]> {
-  const requestId = parseInt(v1().replace(/-/g, ''))
+  console.log('getHistoricalData')
+  const requestId = parseInt(v1().replace(/\D/g, '').slice(0, 5))
+
   const bars: Omit<Bar, 'id'>[] = []
   const ib = await initConnection()
   console.log('getHistoricalData')
