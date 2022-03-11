@@ -15,13 +15,12 @@ export function SymbolsList() {
 
   return (
     <main>
-      <h2>SymbolsList</h2>
       {_useRequest.requestStatus === 'success' ? (
         <ul className="flex flex-col">
           {_useRequest.data.map((data) => (
             <Link
               to={`/bars/${data.symbol}`}
-              className="shadow-md rounded-[3px] mb-[5px] p-[10px] border-collapse flex justify-between items-center"
+              className="shadow-md rounded-[3px] mb-[5px] p-[10px] border-collapse flex justify-between items-center bg-[#333] text-white border border-stone-700"
             >
               <span>{data.symbol}</span>
               <span className="text-[12px]">{data.count}</span>

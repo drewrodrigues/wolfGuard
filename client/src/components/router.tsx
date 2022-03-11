@@ -4,6 +4,7 @@ import { Bars } from './bars'
 import { BarsCache } from './barsCache'
 import { Strategy } from './strategy'
 import { SymbolsList } from './symbolsList'
+import { Trader } from './trader'
 
 export function Router() {
   return (
@@ -12,6 +13,7 @@ export function Router() {
       <Route path="/bars/:symbol" element={<Bars />} />
       <Route path="/strategy" element={<Strategy />} />
       <Route path="/cache" element={<BarsCache />} />
+      <Route path="/trader" element={<Trader />} />
     </Routes>
   )
 }

@@ -2,38 +2,39 @@ import React from 'react'
 import { BrowserRouter, Link, NavLink } from 'react-router-dom'
 import { Router } from './components/router'
 
+const ROUTES = [
+  {
+    title: 'Symbols',
+    path: '/'
+  },
+  {
+    title: 'Strategy',
+    path: '/strategy'
+  },
+  { title: 'Cache', path: '/cache' },
+  { title: 'Trader', path: '/trader' }
+]
+
 function App() {
   return (
     <BrowserRouter>
       <div className="mx-[20px]">
-        <nav className="flex justify-between items-center py-[20px]">
+        <nav className="flex justify-between items-center py-[20px] text-white">
           <Link to="/" className="font-bold">
             SmartTrader
           </Link>
 
           <aside className="text-[14px]">
-            <NavLink
-              to="/"
-              className={(props) => (props.isActive ? 'underline' : '')}
-            >
-              Symbols
-            </NavLink>
-            <NavLink
-              to="/strategy"
-              className={(props) =>
-                props.isActive ? 'underline ml-[10px]' : 'ml-[10px]'
-              }
-            >
-              Strategy
-            </NavLink>
-            <NavLink
-              to="/cache"
-              className={(props) =>
-                props.isActive ? 'underline ml-[10px]' : 'ml-[10px]'
-              }
-            >
-              Cache
-            </NavLink>
+            {ROUTES.map((route) => (
+              <NavLink
+                to={route.path}
+                className={(props) =>
+                  props.isActive ? 'ml-[10px] underline' : 'ml-[10px]'
+                }
+              >
+                {route.title}
+              </NavLink>
+            ))}
           </aside>
         </nav>
 
