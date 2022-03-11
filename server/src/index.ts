@@ -5,6 +5,7 @@ import { barsCacheController } from './controllers/barsCacheController'
 import { barsController } from './controllers/barsController'
 import { strategyController } from './controllers/strategyController'
 import { symbolsController } from './controllers/symbolsController'
+import { traderController } from './controllers/traderController'
 
 const app = express()
 
@@ -20,6 +21,7 @@ app.use('/bars', barsController)
 app.use('/symbols', symbolsController)
 app.use('/barsCache', barsCacheController)
 app.use('/strategy', strategyController)
+app.use('/trader', traderController)
 
 app.listen(3000, () => {
   console.log('🚀 Server ready at http://localhost:3000')
