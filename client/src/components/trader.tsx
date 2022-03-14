@@ -116,8 +116,8 @@ export function Trader() {
         />
       </div>
 
+      <h2 className="font-bold text-white mb-[10px]">Full day</h2>
       <div className="mb-[20px] bg-[#333] border-stone-700 p-[20px] rounded-[5px]">
-        <h2 className="font-bold text-white mb-[10px]">Full day</h2>
         <Bar
           data={data}
           options={{
