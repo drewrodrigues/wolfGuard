@@ -45,18 +45,6 @@ export async function liveBars(updateCallback: (bars: any) => any) {
       } else {
         console.log('Finished bar, not storing')
       }
-      console.log({
-        reqId,
-        time,
-        open,
-        high,
-        low,
-        close,
-        volume,
-        count,
-        wap,
-        hasGaps
-      })
     }
   )
 
@@ -84,17 +72,6 @@ export async function liveBars(updateCallback: (bars: any) => any) {
         bars: sortedBars,
         currentPrice: sortedBars[sortedBars.length - 1].close,
         recentBars
-      })
-      console.log('EventName.historicalDataUpdate: ', {
-        reqId,
-        time,
-        open,
-        high,
-        low,
-        close,
-        volume,
-        count,
-        wap
       })
     }
   )
