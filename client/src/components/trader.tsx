@@ -18,8 +18,9 @@ export function Trader() {
   const { socketStatus, socket } = useSocket()
   const [liveData, setLiveData] = useState<{
     bars: LiveBar[]
+    recentBars: LiveBar[]
     currentPrice: number
-  }>({ bars: [], currentPrice: 0 })
+  }>({ bars: [], currentPrice: 0, recentBars: [] })
 
   useEffect(() => {
     if (socketStatus === 'connected') {
@@ -32,12 +33,22 @@ export function Trader() {
     }
   }, [socketStatus])
 
-  const labels = liveData.bars.map((bar) => bar.time)
   const data = {
-    labels,
+    labels: liveData.bars.map((bar) => bar.time),
     datasets: [
       {
         data: Object.values(liveData.bars).map((liveBar) => liveBar.close),
+        backgroundColor: 'red'
+      }
+    ]
+  }
+  const recentData = {
+    labels: liveData.recentBars.map((bar) => bar.time),
+    datasets: [
+      {
+        data: Object.values(liveData.recentBars).map(
+          (liveBar) => liveBar.close
+        ),
         backgroundColor: 'red'
       }
     ]
@@ -62,6 +73,23 @@ export function Trader() {
       </header>
 
       <div className="mb-[20px] bg-[#333] border-stone-700 p-[20px] rounded-[5px]">
+        <h2 className="font-bold text-white mb-[10px]">Recent (30 mins)</h2>
+        <Bar
+          data={recentData}
+          options={{
+            scales: {
+              x: { display: false },
+              y: {
+                beginAtZero: false,
+                grid: { drawBorder: true, color: '#777' }
+              }
+            }
+          }}
+        />
+      </div>
+
+      <div className="mb-[20px] bg-[#333] border-stone-700 p-[20px] rounded-[5px]">
+        <h2 className="font-bold text-white mb-[10px]">Full day</h2>
         <Bar
           data={data}
           options={{

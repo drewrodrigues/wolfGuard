@@ -75,9 +75,15 @@ export async function liveBars(updateCallback: (bars: any) => any) {
         exchange: 'SMART'
       }
       const sortedBars = sortBars(bars)
+      const recentBars = sortedBars.slice(
+        sortedBars.length - 30,
+        sortedBars.length
+      )
+
       updateCallback({
         bars: sortedBars,
-        currentPrice: sortedBars[sortedBars.length - 1].close
+        currentPrice: sortedBars[sortedBars.length - 1].close,
+        recentBars
       })
       console.log('EventName.historicalDataUpdate: ', {
         reqId,
