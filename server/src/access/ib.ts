@@ -13,8 +13,8 @@ export function initConnection(): Promise<IBApi> {
   return new Promise((resolve, reject) => {
     const logFn = logFunction('initConnection')
     if (ib) {
-      logFn('Removing all listeners.')
-      ib.removeAllListeners()
+      // logFn('Removing all listeners.')
+      // ib.removeAllListeners()
     }
 
     if (!ib?.isConnected) {
