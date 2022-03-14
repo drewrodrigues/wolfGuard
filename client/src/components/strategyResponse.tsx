@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import React from 'react'
 import { IStrategy } from '../../../common'
 
-const dollarFormatter = new Intl.NumberFormat('en-US', {
+export const dollarFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
   signDisplay: 'auto'

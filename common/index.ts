@@ -1,5 +1,7 @@
 import { Bar } from '../server/node_modules/.prisma/client/index'
 
+export type LiveBar = Omit<Bar, 'id'>
+
 export interface BuyConditionOrb {
   orbDuration: number
 }

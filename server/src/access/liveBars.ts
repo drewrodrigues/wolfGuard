@@ -1,6 +1,14 @@
 import { BarSizeSetting, Contract, EventName, SecType } from '@stoqey/ib'
+import { LiveBar } from '../../../common'
+import { barTimeToSavableFormat } from '../utils/date'
 import { uniqueRequestId } from '../utils/uniqueRequestId'
 import { initConnection } from './ib'
+
+function sortBars(inputBars: Record<string, LiveBar>): LiveBar[] {
+  return Object.values(inputBars).sort(
+    (a, b) => a.time.getTime() - b.time.getTime()
+  )
+}
 
 export async function liveBars(updateCallback: (bars: any) => any) {
   // TODO: build historical bars first and then chain up bar updates (send as object so we keep unique times)
@@ -17,23 +25,22 @@ export async function liveBars(updateCallback: (bars: any) => any) {
   const durationString = '1 D'
 
   type DateString = string
-  const bars: Record<DateString, object> = {}
+  const bars: Record<DateString, LiveBar> = {}
 
   ib.on(
     EventName.historicalData,
     (reqId, time, open, high, low, close, volume, count, wap, hasGaps) => {
       if (!time.includes('finished')) {
         bars[time] = {
-          reqId,
-          time,
+          time: barTimeToSavableFormat(time),
           open,
           high,
           low,
           close,
           volume,
-          count,
-          wap,
-          hasGaps
+          symbol: 'MSFT',
+          type: '1 min',
+          exchange: 'SMART'
         }
       } else {
         console.log('Finished bar, not storing')
@@ -57,17 +64,21 @@ export async function liveBars(updateCallback: (bars: any) => any) {
     EventName.historicalDataUpdate,
     (reqId, time, open, high, low, close, volume, count, wap) => {
       bars[time] = {
-        reqId,
-        time,
+        time: barTimeToSavableFormat(time),
         open,
         high,
         low,
         close,
         volume,
-        count,
-        wap
+        symbol: 'MSFT',
+        type: '1 min',
+        exchange: 'SMART'
       }
-      updateCallback(bars)
+      const sortedBars = sortBars(bars)
+      updateCallback({
+        bars: sortedBars,
+        currentPrice: sortedBars[sortedBars.length - 1].close
+      })
       console.log('EventName.historicalDataUpdate: ', {
         reqId,
         time,

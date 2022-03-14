@@ -1,9 +1,25 @@
+import {
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  LinearScale,
+  Tooltip
+} from 'chart.js'
+import classNames from 'classnames'
 import React, { useEffect, useState } from 'react'
+import { Bar } from 'react-chartjs-2'
+import { LiveBar } from '../../../common'
 import { useSocket } from '../hooks/useSocket'
+import { dollarFormatter } from './strategyResponse'
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip)
 
 export function Trader() {
   const { socketStatus, socket } = useSocket()
-  const [liveBars, setLiveBars] = useState<object>({})
+  const [liveData, setLiveData] = useState<{
+    bars: LiveBar[]
+    currentPrice: number
+  }>({ bars: [], currentPrice: 0 })
 
   useEffect(() => {
     if (socketStatus === 'connected') {
@@ -11,31 +27,54 @@ export function Trader() {
       socket.on<any>('barUpdate', (arg: any) => {
         console.log('Received `barUpdate`')
         console.log(arg)
-        setLiveBars(arg)
+        setLiveData(arg)
       })
     }
   }, [socketStatus])
 
+  const labels = liveData.bars.map((bar) => bar.time)
+  const data = {
+    labels,
+    datasets: [
+      {
+        data: Object.values(liveData.bars).map((liveBar) => liveBar.close),
+        backgroundColor: 'red'
+      }
+    ]
+  }
+
+  console.log({ data: liveData })
+
   return (
     <main>
-      <h2>Socket status: {socketStatus}</h2>
+      <header className="flex justify-between items-center">
+        <h2
+          className={classNames({
+            'text-green-400': socketStatus === 'connected',
+            'text-red-400': socketStatus !== 'connected'
+          })}
+        >
+          Socket status: {socketStatus}
+        </h2>
+        <h3 className="text-white font-bold text-[32px]">
+          {dollarFormatter.format(liveData.currentPrice)}
+        </h3>
+      </header>
 
-      {Object.keys(liveBars).map((dateTime) => {
-        // @ts-ignore
-        const barData = liveBars[dateTime]
-
-        return (
-          <div className="mb-[5px] rounded-[5px] text-white bg-[#333] border-stone-700 p-[20px]">
-            <p>time: {barData.time}</p>
-            <p>high: {barData.high}</p>
-            <p>low: {barData.low}</p>
-            <p>open: {barData.open}</p>
-            <p>close: {barData.close}</p>
-            <p>wap: {barData.wap}</p>
-            <p>volume: {barData.volume}</p>
-          </div>
-        )
-      })}
+      <div className="mb-[20px] bg-[#333] border-stone-700 p-[20px] rounded-[5px]">
+        <Bar
+          data={data}
+          options={{
+            scales: {
+              x: { display: false },
+              y: {
+                beginAtZero: false,
+                grid: { drawBorder: true, color: '#777' }
+              }
+            }
+          }}
+        />
+      </div>
     </main>
   )
 }
