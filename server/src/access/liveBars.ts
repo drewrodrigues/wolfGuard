@@ -10,7 +10,13 @@ function sortBars(inputBars: Record<string, LiveBar>): LiveBar[] {
   )
 }
 
-export async function liveBars(updateCallback: (bars: any) => any) {
+interface LiveBarUpdate {
+  bars: LiveBar[]
+  currentPrice: number
+  recentBars: LiveBar[]
+}
+
+export async function liveBars(updateCallback: (bars: LiveBarUpdate) => any) {
   // TODO: build historical bars first and then chain up bar updates (send as object so we keep unique times)
   // * they come back as 1m bars
 
