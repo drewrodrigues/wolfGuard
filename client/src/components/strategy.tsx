@@ -4,8 +4,6 @@ import { IStrategyResponse } from '../../../common'
 import { useRequest } from '../hooks/request'
 import { StrategyResponse } from './strategyResponse'
 
-const ORB_BUY_DURATIONS = [1, 5, 10, 15, 30]
-const SMA_SELL_DROP_DURATIONS = [3, 4, 5, 10, 20, 30, 60]
 const WITHIN_LAST_N_TRADING_DAYS = [7, 15, 30, 60, 90, 180, 365, 500, 1000]
 
 export function Strategy() {

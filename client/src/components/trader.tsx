@@ -70,12 +70,13 @@ export function Trader() {
     <main>
       <header className="flex justify-between items-center">
         <h2
-          className={classNames({
+          className={classNames('align-center', {
             'text-green-400': socketStatus === 'connected',
             'text-red-400': socketStatus !== 'connected'
           })}
         >
-          Socket status: {socketStatus}
+          {socketStatus === 'connected' ? '✅ ' : '❌  '}
+          Socket <span className="font-bold">{socketStatus}</span>
         </h2>
         <h3 className="text-white font-bold text-[32px]">
           {dollarFormatter.format(liveData.currentPrice)}
@@ -92,7 +93,7 @@ export function Trader() {
         <span className="font-bold">{moment(marketTime).format('h:mm A')}</span>
       </h4>
 
-      <div className="mb-[20px] bg-[#333] border-stone-700 p-[20px] rounded-[5px]">
+      <div className="mb-[20px] bg-[#333] shadow-md border border-stone-700 p-[20px] rounded-[5px]">
         <h2 className="font-bold text-white mb-[10px]">Positions</h2>
 
         {liveData.shouldBuy !== undefined && (
@@ -101,7 +102,7 @@ export function Trader() {
       </div>
 
       <h2 className="font-bold text-white mb-[10px]">Recent (30m)</h2>
-      <div className="mb-[20px] bg-[#333] border-stone-700 p-[20px] rounded-[5px]">
+      <div className="mb-[20px] bg-[#333] shadow-md border border-stone-700 p-[20px] rounded-[5px]">
         <Bar
           data={recentData}
           options={{
@@ -117,7 +118,7 @@ export function Trader() {
       </div>
 
       <h2 className="font-bold text-white mb-[10px]">Full day</h2>
-      <div className="mb-[20px] bg-[#333] border-stone-700 p-[20px] rounded-[5px]">
+      <div className="mb-[20px] bg-[#333] shadow-md border border-stone-700 p-[20px] rounded-[5px]">
         <Bar
           data={data}
           options={{
