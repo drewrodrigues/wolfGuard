@@ -1,6 +1,7 @@
 import { Contract, SecType } from '@stoqey/ib'
 import { db } from '../access/db'
 import { getHistoricalData } from '../access/history'
+import { keepAlive } from '../utils/keepAlive'
 
 enum StockSymbol {
   AAPL = 'APPL',
@@ -54,9 +55,7 @@ async function run() {
   }
 }
 
-const interval = setInterval(() => {
-  console.log(`Ping <${'-'.repeat(Math.floor(Math.random() * 20))}`)
-}, 1000 * 10)
+const interval = keepAlive()
 
 run()
   .then(() => {

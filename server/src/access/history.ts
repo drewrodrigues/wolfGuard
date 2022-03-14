@@ -1,12 +1,12 @@
 import { Bar } from '@prisma/client'
 import { BarSizeSetting, Contract, EventName } from '@stoqey/ib'
-import { v1 } from 'uuid'
 import { barTimeToSavableFormat } from '../utils/date'
+import { uniqueRequestId } from '../utils/uniqueRequestId'
 import { initConnection } from './ib'
 
 export async function getHistoricalData(contract: Contract): Promise<any[]> {
   console.log('getHistoricalData')
-  const requestId = parseInt(v1().replace(/\D/g, '').slice(0, 5))
+  const requestId = uniqueRequestId()
 
   const bars: Omit<Bar, 'id'>[] = []
   const ib = await initConnection()
