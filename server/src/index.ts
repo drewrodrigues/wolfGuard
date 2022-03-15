@@ -3,15 +3,13 @@ import express from 'express'
 import http from 'http'
 import morgan from 'morgan'
 import { Server } from 'socket.io'
-import { liveBars } from './access/liveBars'
-import { getOpenOrders } from './access/orders'
-import { buyStrategyIncreasingBars } from './access/strategy/buyStrategyIncreasingBars'
+import { startLiveBars, stopLiveBars } from './access/liveBars'
+import { getOpenOrders, getPositions } from './access/orders'
 import { barsCacheController } from './controllers/barsCacheController'
 import { barsController } from './controllers/barsController'
 import { strategyController } from './controllers/strategyController'
 import { symbolsController } from './controllers/symbolsController'
 import { traderController } from './controllers/traderController'
-import { buyOrder } from './utils/buyOrder'
 
 const app = express()
 const server = http.createServer(app)
@@ -35,37 +33,45 @@ app.use('/barsCache', barsCacheController)
 app.use('/strategy', strategyController)
 app.use('/trader', traderController)
 
-io.on('connection', (socket) => {
-  console.log('a user connected, emitting barUpdate')
+io.on('connection', async (socket) => {
+  console.log('a socket connected with id=', socket.id)
 
-  console.log('Calling live bars')
-  liveBars(async (update) => {
-    console.log('liveBars callback')
-    // TODO: check if we should buy or sell and return open positions with bar update
+  // keep open orders in memory after first query?
+  // then keep in sync?
+  // TODO: send these to the client -- and also store them in memory
 
-    let shouldBuy
-    try {
-      shouldBuy = buyStrategyIncreasingBars(update.bars, 2)
-    } catch (e) {
-      console.error('Failed to buy with: ', e)
-    }
-    console.log({ shouldBuy })
-
+  startLiveBars(async (update) => {
+    console.count('startLiveBars (update count)')
     const openOrders = await getOpenOrders()
-    console.log({ openOrders: openOrders.length })
+    const positions = await getPositions()
+    console.log('liveBars callback')
+    
+    // TODO: check if we should buy or sell and return open positions with bar update
+    // let shouldBuy
+    // try {
+    //   shouldBuy = buyStrategyIncreasingBars(update.bars, 2)
+    // } catch (e) {
+    //   console.error('Failed to buy with: ', e)
+    // }
+    // console.log({ shouldBuy })
 
-    if (shouldBuy && !openOrders.length) {
-      console.log('Attemping a buy order...')
-      const lastBar = update.bars[update.bars.length - 1]
-      buyOrder()
-    }
+    // if (shouldBuy && !openOrders.length) {
+    //   console.log('Attemping a buy order...')
+    //   const lastBar = update.bars[update.bars.length - 1]
+    //   buyOrder()
+    // }
 
-    console.log('Emitting barUpdate')
-    socket.emit('barUpdate', { ...update, shouldBuy, openOrders })
+    socket.emit('barUpdate', {
+      ...update,
+      shouldBuy: false,
+      openOrders,
+      openPositions: positions
+    })
   })
 
-  socket.on('disconnect', () => {
-    console.log('Socket disconnected')
+  socket.on('disconnect', async () => {
+    await stopLiveBars()
+    console.log('Socket disconnected & live bars stopped')
   })
 })
 
