@@ -1,10 +1,13 @@
 import classNames from 'classnames'
 import React, { useEffect, useState } from 'react'
-import { IStrategyResponse } from '../../../common'
+import {
+  BuyStrategyType,
+  IStrategyResponse,
+  SellStrategyType
+} from '../../../common'
 import { useRequest } from '../hooks/request'
+import { OptionGroup } from './shared/optionGroup'
 import { StrategyResponse } from './strategyResponse'
-
-const WITHIN_LAST_N_TRADING_DAYS = [7, 15, 30, 60, 90, 180, 365, 500, 1000]
 
 export function Strategy() {
   const requestSymbols = useRequest<{ symbol: string }[]>()
@@ -14,13 +17,18 @@ export function Strategy() {
 
   const [symbol, setSymbol] = useState<string>('MSFT')
   // TODO implement
-  const [sellBeforeClose, setSellBeforeClose] = useState<number>(30)
+  const [
+    closeOutNMinutesBeforeMarketClose,
+    setCloseOutNMinutesBeforeMarketClose
+  ] = useState<number>(30)
+  const [selectedBuyStrategy, setSelectedBuyStrategy] = useState<
+    BuyStrategyType | undefined
+  >('ORB Long')
+  const [selectedSellStrategy, setSelectedSellStrategy] = useState<
+    SellStrategyType | undefined
+  >('SMA Drop')
 
-  const [orbBuyDuration, setOrbBuyDuration] = useState(1)
-  const [nLastTradingDays, setNLastTradingDays] = useState(
-    WITHIN_LAST_N_TRADING_DAYS[0]
-  )
-  const [smaSellDropDuration, setSellSmaDropDuration] = useState(3)
+  console.log(selectedBuyStrategy)
 
   useEffect(() => {
     requestSymbols.call('/symbols')
@@ -35,39 +43,89 @@ export function Strategy() {
       method: 'POST',
       data: {
         symbol,
-        lotSize: 100
+        lotSize: 100,
+        closeOutNMinutesBeforeMarketClose,
+        buyStrategy: selectedBuyStrategy,
+        sellStrategy: selectedSellStrategy
       }
     })
+
+    console.log({ strategyRun })
     setResults(strategyRun)
   }
 
   return (
     <>
-      <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px] bg-[#333] border-stone-700 flex justify-between items-center">
+      <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px] bg-[#333] border-stone-700">
         <main>
-          <h3 className="text-white">Selection</h3>
+          <section className="flex justify-between mb-[20px]">
+            <div>
+              <h4 className="text-white mb-[5px] font-bold text-[14px]">
+                Buy Strategy
+              </h4>
+              <OptionGroup
+                value={selectedBuyStrategy}
+                options={['ORB Long', 'Increasing Bars']}
+                onUpdate={(newValue) => setSelectedBuyStrategy(newValue)}
+              />
+            </div>
 
-          {requestSymbols.requestStatus === 'success' ? (
-            <select
-              value={symbol}
-              onChange={(e) => setSymbol(e.target.value)}
-              className="border"
-            >
-              {requestSymbols.data.map((data) => (
-                <option value={data.symbol}>{data.symbol}</option>
-              ))}
-            </select>
-          ) : (
-            'Loading...'
-          )}
+            <div>
+              <h4 className="text-white mb-[5px] font-bold text-[14px]">
+                Sell Strategy
+              </h4>
+              <OptionGroup
+                value={selectedSellStrategy}
+                options={['SMA Drop', 'Decreasing Bars']}
+                onUpdate={(newValue) => setSelectedSellStrategy(newValue)}
+              />
+            </div>
+          </section>
+
+          <section className="mb-[20px]">
+            <h3 className="text-white mb-[5px] font-bold text-[14px]">
+              Close Out
+            </h3>
+            <p className="text-white">
+              <select
+                className="text-black mr-[5px]"
+                onChange={(e) =>
+                  setCloseOutNMinutesBeforeMarketClose(parseInt(e.target.value))
+                }
+                value={closeOutNMinutesBeforeMarketClose}
+              >
+                {[5, 10, 15, 30, 60].map((nMinutes) => (
+                  <option value={nMinutes}>{nMinutes}</option>
+                ))}
+              </select>
+              minutes before market close
+            </p>
+          </section>
+
+          <section className="mb-[20px]">
+            <h3 className="text-white mb-[5px] font-bold text-[14px]">
+              Symbol
+            </h3>
+            {requestSymbols.requestStatus === 'success' ? (
+              <select
+                value={symbol}
+                onChange={(e) => setSymbol(e.target.value)}
+                className="border w-full p-[10px] text-center"
+              >
+                {requestSymbols.data.map((data) => (
+                  <option value={data.symbol}>{data.symbol}</option>
+                ))}
+              </select>
+            ) : (
+              'Loading...'
+            )}
+          </section>
         </main>
 
         <button
-          className={classNames({
-            'bg-green-300 p-[10px] rounded-[10px]':
-              runStrategy.requestStatus !== 'in-progress',
-            'bg-gray-300 p-[10px] rounded-[10px]':
-              runStrategy.requestStatus === 'in-progress'
+          className={classNames('p-[10px] rounded-[10px] text-white', {
+            'bg-green-400': runStrategy.requestStatus !== 'in-progress',
+            'bg-gray-400': runStrategy.requestStatus === 'in-progress'
           })}
           onClick={onRunAllCombinations}
         >
@@ -79,8 +137,6 @@ export function Strategy() {
 
       {results.length > 0 && (
         <section className="mb-[10px]">
-          <h3 className="text-[20px] font-bold">Results</h3>
-
           {results.map((result) => (
             <StrategyResponse strategies={result} />
           ))}

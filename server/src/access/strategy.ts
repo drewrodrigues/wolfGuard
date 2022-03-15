@@ -1,11 +1,13 @@
 import moment from 'moment'
 import {
+  BuyStrategyType,
+  IBuyOrder,
   IOrders,
   IOrderSummary,
   IOverallSummary,
   IRunStrategyResult,
-  RunStrategyBuyOptions,
-  RunStrategySellOptions
+  ISellOrder,
+  SellStrategyType
 } from '../../../common'
 import { barsByDay } from '../utils/bars'
 import { db } from './db'
@@ -18,15 +20,26 @@ export const WITHIN_LAST_N_TRADING_DAYS = [
   7, 15, 30, 60, 90, 180, 365, 500, 1000
 ]
 
+interface RunStrategyBuyCondition {
+  strategy: BuyStrategyType
+  quantity: number
+}
+
+interface RunStrategySellCondition {
+  strategy: SellStrategyType
+  quantity: number
+  closeOutNMinutesBeforeMarketClose: number
+}
+
 // TODO add support for multiple buy/sells each day
-export async function runStrategy(options: {
-  buyOptions: RunStrategyBuyOptions
-  sellOptions: RunStrategySellOptions
-  symbol: string
+export async function runStrategy(
+  buyCondition: RunStrategyBuyCondition,
+  sellCondition: RunStrategySellCondition,
+  symbol: string,
   lotSize: number
-}): Promise<IRunStrategyResult[]> {
+): Promise<IRunStrategyResult[]> {
   const bars = await db.bar.findMany({
-    where: { symbol: options.symbol },
+    where: { symbol: symbol },
     orderBy: { time: 'desc' }
   })
 
@@ -48,6 +61,7 @@ export async function runStrategy(options: {
     tradingDays: 0,
     biggestLoss: 0,
     biggestWin: 0,
+    // TODO: strong type with client
     sellTypes: {
       'close-out': 0,
       'sma-drop': 0
@@ -63,29 +77,42 @@ export async function runStrategy(options: {
   // at each day --
   for (const date in _barsByDay) {
     const barsToday = _barsByDay[date]
-    const buyOrder = buyStrategyOrbLong(
-      barsToday,
-      options.buyOptions.buyCondition.orbDuration,
-      options.lotSize
-    )
+
+    let buyOrder: IBuyOrder | null = null
+    if (buyCondition.strategy === 'ORB Long') {
+      buyOrder = buyStrategyOrbLong(barsToday, buyCondition.quantity, lotSize)
+    } else {
+      throw new Error(
+        `BuyCondition strategy not implemented: ${buyCondition.strategy}`
+      )
+    }
 
     if (buyOrder) {
       totalBuyInPositionValues += buyOrder.value
 
       runningSummary.tradingDays++
-      let sellOrder = sellStrategySmaDrop(
-        barsToday,
-        options.sellOptions.sellCondition.smaDuration,
-        buyOrder.buyBarIndex,
-        options.lotSize
-      )
+
+      let sellOrder: ISellOrder | null = null
+
+      if (sellCondition.strategy === 'SMA Drop') {
+        sellOrder = sellStrategySmaDrop(
+          barsToday,
+          sellCondition.quantity,
+          buyOrder.buyBarIndex,
+          lotSize
+        )
+      } else {
+        throw new Error(
+          `SellCondition strategy not implemented: ${sellCondition.strategy}`
+        )
+      }
 
       if (!sellOrder) {
         sellOrder = sellStrategyBeforeMarketClose(
           barsToday,
-          30,
+          sellCondition.closeOutNMinutesBeforeMarketClose,
           buyOrder.buyBarIndex,
-          options.lotSize
+          lotSize
         )
       }
 

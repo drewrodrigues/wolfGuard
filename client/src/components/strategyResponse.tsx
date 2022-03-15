@@ -16,11 +16,11 @@ export function StrategyResponse({
 }: IStrategyResponseProps) {
   return (
     <main className="rounded-[5px] mr-[5px] mb-[10px]">
-      <header className="text-[12px] flex justify-between">
-        <h2>
+      <header className="text-[12px] flex justify-between mb-[5px]">
+        <h2 className="text-white">
           Buy Strategy: <span className="font-bold">{buyStrategy} ORB</span>
         </h2>
-        <h2>
+        <h2 className="text-white">
           Sell Strategy:{' '}
           <span className="font-bold">{sellStrategy} SMA drop</span>
         </h2>

@@ -2,6 +2,9 @@ import { Bar } from '../server/node_modules/.prisma/client/index'
 
 export type LiveBar = Omit<Bar, 'id'>
 
+export type BuyStrategyType = 'ORB Long' | 'Increasing Bars'
+export type SellStrategyType = 'SMA Drop' | 'Decreasing Bars'
+
 export interface BuyConditionOrb {
   orbDuration: number
 }
@@ -16,6 +19,7 @@ export interface SellConditionSMADrop {
 
 export interface RunStrategySellOptions {
   sellCondition: SellConditionSMADrop
+  closeOutNMinutesBeforeMarketClose: number
 }
 
 export interface RunStrategyReturn {

@@ -64,6 +64,7 @@ export function useRequest<T>(): useRequestType<T> & {
       }
 
       setState(useRequestFailValue)
+      throw e
     }
   }
 
