@@ -20,7 +20,7 @@ export function OptionGroup<T>({
         return (
           <button
             className={classNames(
-              'text-white rounded-[5px] px-[7px] mr-[5px]',
+              'text-white rounded-[5px] px-[7px] mr-[5px] mb-[5px]',
               {
                 'bg-green-400': isSelected,
                 'bg-gray-400': !isSelected

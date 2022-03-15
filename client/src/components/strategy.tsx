@@ -15,9 +15,9 @@ export function Strategy() {
 
   const [results, setResults] = useState<IStrategyResponse>([])
 
-  const [portfolioStartingValue, setPortfolioStartingValue] = useState(50000)
+  const [startingPortfolioBalance, setStartingPortfolioBalance] =
+    useState(50000)
   const [maxPositionPerTrade, setMaxPositionPerTrade] = useState(1000)
-  const [symbol, setSymbol] = useState<string>('MSFT')
   const [
     closeOutNMinutesBeforeMarketClose,
     setCloseOutNMinutesBeforeMarketClose
@@ -28,6 +28,7 @@ export function Strategy() {
   const [selectedSellStrategy, setSelectedSellStrategy] = useState<
     SellStrategyType | undefined
   >('SMA Drop')
+  const [symbol, setSymbol] = useState<string | undefined>('MSFT')
 
   useEffect(() => {
     requestSymbols.call('/symbols')
@@ -44,7 +45,9 @@ export function Strategy() {
         symbol,
         closeOutNMinutesBeforeMarketClose,
         buyStrategy: selectedBuyStrategy,
-        sellStrategy: selectedSellStrategy
+        sellStrategy: selectedSellStrategy,
+        startingPortfolioBalance,
+        maxPositionPerTrade
       }
     })
 
@@ -61,8 +64,10 @@ export function Strategy() {
         <input
           type="text"
           className="p-[5px] mb-[10px]"
-          value={portfolioStartingValue}
-          onChange={(e) => setPortfolioStartingValue(parseInt(e.target.value))}
+          value={startingPortfolioBalance}
+          onChange={(e) =>
+            setStartingPortfolioBalance(parseInt(e.target.value))
+          }
         />
 
         <h5 className="text-white mb-[5px] text-[14px]">
@@ -131,15 +136,11 @@ export function Strategy() {
               Symbol
             </h3>
             {requestSymbols.requestStatus === 'success' ? (
-              <select
+              <OptionGroup
+                options={requestSymbols.data.map((data) => data.symbol)}
                 value={symbol}
-                onChange={(e) => setSymbol(e.target.value)}
-                className="border w-full p-[10px] text-center"
-              >
-                {requestSymbols.data.map((data) => (
-                  <option value={data.symbol}>{data.symbol}</option>
-                ))}
-              </select>
+                onUpdate={(value) => setSymbol(value)}
+              />
             ) : (
               'Loading...'
             )}
