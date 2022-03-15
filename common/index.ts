@@ -1,4 +1,10 @@
+// ! are these project references correct?
 import { Bar } from '../server/node_modules/.prisma/client/index'
+import {
+  Contract,
+  Order,
+  OrderState
+} from '../server/node_modules/@stoqey/ib/dist/index'
 
 export type LiveBar = Omit<Bar, 'id'>
 
@@ -101,3 +107,18 @@ export interface IStrategy {
 }
 
 export type IStrategyResponse = IStrategy[]
+
+// live trading
+export interface OpenOrder {
+  orderId: number
+  contract: Contract
+  order: Order
+  orderState: OrderState
+}
+
+export interface OpenPosition {
+  account: string
+  lotSize: number
+  contract: Contract
+  averageCost?: number
+}

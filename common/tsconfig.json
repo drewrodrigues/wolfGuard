@@ -8,6 +8,7 @@
     "composite": true
   },
   "references": [
-    {"path": "../server/node_modules/.prisma/client"}
+    {"path": "../server/node_modules/.prisma/client"},
+    {"path": "../server/node_modules/@stoqey/ib"}
   ]
 }
