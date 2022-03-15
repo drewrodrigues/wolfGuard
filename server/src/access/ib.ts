@@ -12,12 +12,9 @@ let ib: IBApi
 export function initConnection(): Promise<IBApi> {
   return new Promise((resolve, reject) => {
     const logFn = logFunction('initConnection')
-    if (ib) {
-      // logFn('Removing all listeners.')
-      // ib.removeAllListeners()
-    }
 
-    if (!ib?.isConnected) {
+    const notConnected = !ib?.isConnected
+    if (notConnected) {
       logFn('Not connected. Connecting.')
       ib = new IBApi({
         port: 7497

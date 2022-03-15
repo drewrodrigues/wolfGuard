@@ -64,7 +64,6 @@ export function Trader() {
   }
 
   const isMarketOpen = moment(marketTime).isBetween(MARKET_OPEN, MARKET_CLOSE)
-  console.log({ data: liveData })
 
   return (
     <main>
