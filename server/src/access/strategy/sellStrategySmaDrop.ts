@@ -12,7 +12,8 @@ export function sellStrategySmaDrop(
   // * might occur one the first bar we can sell)
   // ? or do we want to allow the ability to start the sma
   // ? after we start a buy?
-  barBuyIndex: number
+  barBuyIndex: number,
+  lotSize: number
 ): ISellOrder | null {
   const smas = _runningSmasForBars(bars, duration)
 
@@ -30,8 +31,7 @@ export function sellStrategySmaDrop(
     if (smaHasDropped) {
       return {
         bar: currentBar,
-        // TODO: implement based upon maxPositionPerTrade (used to be `lotSize`)
-        value: currentBar.close,
+        value: currentBar.close * lotSize,
         type: 'sma-drop'
       }
     }

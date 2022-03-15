@@ -50,10 +50,8 @@ export async function getHistoricalData(contract: Contract): Promise<any[]> {
         hasGaps
       ) => {
         if (time.includes('finished')) {
-          console.error('hmm: ', time)
           resolve(bars)
         } else if (dataRequestId === requestId) {
-          console.log('Pushing bar', { time })
           const newBar: Omit<Bar, 'id'> = {
             symbol: contract.symbol!,
             time: barTimeToSavableFormat(time),
@@ -65,7 +63,6 @@ export async function getHistoricalData(contract: Contract): Promise<any[]> {
             type: BarSizeSetting.MINUTES_ONE,
             exchange: contract.exchange!
           }
-          console.log('Pushing bar: ', newBar)
           bars.push(newBar)
         } else {
           console.error('hmm: ', time)

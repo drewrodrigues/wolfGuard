@@ -54,6 +54,23 @@ export function StrategyResponse({
                 {result.nTradingDays}
               </p>
 
+              <p>
+                Balance: {dollarFormatter.format(result.overallSummary.portfolioBalance)}
+              </p>
+              <p>
+                Return: {(result.overallSummary.return * 100).toFixed(2)}%
+              </p>
+              <p>
+                Highest Balance: {dollarFormatter.format(
+                  result.overallSummary.highestPortfolioBalance
+                )}
+              </p>
+              <p>
+                Lowest Balance: {dollarFormatter.format(
+                  result.overallSummary.lowestPortfolioBalance
+                )}
+              </p>
+
               {toggleDetails && (
                 <section className="flex flex-wrap mt-[10px] items-end">
                   <div

@@ -35,7 +35,9 @@ interface RunStrategySellCondition {
 export async function runStrategy(
   buyCondition: RunStrategyBuyCondition,
   sellCondition: RunStrategySellCondition,
-  symbol: string
+  symbol: string,
+  startingPortfolioBalance: number,
+  maxPositionPerTrade: number
 ): Promise<IRunStrategyResult[]> {
   const bars = await db.bar.findMany({
     where: { symbol: symbol },
@@ -53,6 +55,9 @@ export async function runStrategy(
   //   )
   // computed
   const runningSummary = {
+    // TODO: average time to enter
+    // TODO: average time to exit
+    // TODO: average time position open
     totalValue: 0,
     winningTrades: 0,
     losingTrades: 0,
@@ -64,7 +69,10 @@ export async function runStrategy(
     sellTypes: {
       'close-out': 0,
       'sma-drop': 0
-    }
+    },
+    portfolioBalance: startingPortfolioBalance,
+    lowestPortfolioBalance: startingPortfolioBalance,
+    highestPortfolioBalance: startingPortfolioBalance
   }
 
   // to calculate average position size
@@ -79,7 +87,11 @@ export async function runStrategy(
 
     let buyOrder: IBuyOrder | null = null
     if (buyCondition.strategy === 'ORB Long') {
-      buyOrder = buyStrategyOrbLong(barsToday, buyCondition.quantity)
+      buyOrder = buyStrategyOrbLong(
+        barsToday,
+        buyCondition.quantity,
+        maxPositionPerTrade
+      )
     } else {
       throw new Error(
         `BuyCondition strategy not implemented: ${buyCondition.strategy}`
@@ -97,7 +109,8 @@ export async function runStrategy(
         sellOrder = sellStrategySmaDrop(
           barsToday,
           sellCondition.quantity,
-          buyOrder.buyBarIndex
+          buyOrder.buyBarIndex,
+          buyOrder.lotSize
         )
       } else {
         throw new Error(
@@ -109,7 +122,8 @@ export async function runStrategy(
         sellOrder = sellStrategyBeforeMarketClose(
           barsToday,
           sellCondition.closeOutNMinutesBeforeMarketClose,
-          buyOrder.buyBarIndex
+          buyOrder.buyBarIndex,
+          buyOrder.lotSize
         )
       }
 
@@ -117,6 +131,7 @@ export async function runStrategy(
       const end = moment(sellOrder.bar.time)
 
       const difference = sellOrder.value - buyOrder.value
+      runningSummary.portfolioBalance += difference
 
       if (difference > runningSummary.biggestWin) {
         runningSummary.biggestWin = difference
@@ -124,6 +139,18 @@ export async function runStrategy(
 
       if (difference < runningSummary.biggestLoss) {
         runningSummary.biggestLoss = difference
+      }
+
+      if (
+        runningSummary.lowestPortfolioBalance > runningSummary.portfolioBalance
+      ) {
+        runningSummary.lowestPortfolioBalance = runningSummary.portfolioBalance
+      }
+
+      if (
+        runningSummary.highestPortfolioBalance < runningSummary.portfolioBalance
+      ) {
+        runningSummary.highestPortfolioBalance = runningSummary.portfolioBalance
       }
 
       if (difference < 0) {
@@ -164,7 +191,13 @@ export async function runStrategy(
         biggestLoss: runningSummary.biggestLoss,
         averageValuePerDay:
           runningSummary.totalValue / runningSummary.tradingDays,
-        averagePosition: totalBuyInPositionValues / runningSummary.tradingDays // ! update when supporting multiple trades
+        averagePosition: totalBuyInPositionValues / runningSummary.tradingDays, // ! update when supporting multiple trades,
+        highestPortfolioBalance: runningSummary.highestPortfolioBalance,
+        lowestPortfolioBalance: runningSummary.lowestPortfolioBalance,
+        portfolioBalance: runningSummary.portfolioBalance,
+        return:
+          (runningSummary.portfolioBalance - startingPortfolioBalance) /
+          startingPortfolioBalance
         // TODO: profit margin?
       }
       // need to do the below, otherwise they'll all point to the same reference

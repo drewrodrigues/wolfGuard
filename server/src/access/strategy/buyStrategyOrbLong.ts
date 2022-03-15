@@ -7,7 +7,7 @@ import { IBuyOrder } from '../../../../common'
 export function buyStrategyOrbLong(
   bars: Bar[],
   duration: number,
-  enterWithinNMinutes: number = 120
+  maxPositionPerTrade: number
 ): IBuyOrder | null {
   const openingBars = bars.slice(0, duration)
   const lows = openingBars.map((bar) => bar.low)
@@ -24,7 +24,7 @@ export function buyStrategyOrbLong(
   if (!openingRangeLowBar) throw new Error('No opening range low bar found')
 
   // TODO add as param
-  for (let i = duration; i < enterWithinNMinutes; i++) {
+  for (let i = duration; i < bars.length; i++) {
     const bar = bars[i]
 
     // ! this should be changed... Technically, if the `high`
@@ -35,6 +35,14 @@ export function buyStrategyOrbLong(
       ...[bar.open, bar.close, bar.high, bar.low]
     )
 
+    const lotSize = Math.floor(maxPositionPerTrade / bar.open)
+
+    if (lotSize < 1) {
+      throw new Error(
+        `Cannot enter. Max position per trade doesn't allow 1 lot purchase ${bar.open}`
+      )
+    }
+
     if (barMaxPriceAction > openingRangeMax) {
       return {
         bar,
@@ -44,7 +52,8 @@ export function buyStrategyOrbLong(
           highBar: openingRangeHighBar
         },
         // TODO: implement based on maxPositionPerTrade
-        value: bar.open // ! this is technically not correct
+        value: lotSize * bar.open, // ! this is technically not correct,
+        lotSize
       }
     }
   }

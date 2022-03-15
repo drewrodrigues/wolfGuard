@@ -8,9 +8,11 @@ function cacheKey(
   symbol: string,
   closeOutNMinutesBeforeMarketClose: number,
   buyStrategy: string,
-  sellStrategy: string
+  sellStrategy: string,
+  startingPortfolioBalance: number,
+  maxPositionPerTrade: number
 ) {
-  return `symbol=${symbol}-closeOutNMinutesBeforeMarketClose=${closeOutNMinutesBeforeMarketClose}-buyStrategy=${buyStrategy}-sellStrategy=${sellStrategy}`
+  return `symbol=${symbol}-closeOutNMinutesBeforeMarketClose=${closeOutNMinutesBeforeMarketClose}-buyStrategy=${buyStrategy}-sellStrategy=${sellStrategy}-startingPortfolioBalance=${startingPortfolioBalance}-maxPositionPerTrade=${maxPositionPerTrade}`
 }
 
 const ORB_BUY_DURATIONS = [1, 5, 10, 15, 30]
@@ -25,7 +27,9 @@ router.post('/', async (req, res) => {
     symbol,
     closeOutNMinutesBeforeMarketClose,
     buyStrategy,
-    sellStrategy
+    sellStrategy,
+    startingPortfolioBalance,
+    maxPositionPerTrade
   } = req.body
 
   let cachedResponse
@@ -36,7 +40,9 @@ router.post('/', async (req, res) => {
           symbol,
           closeOutNMinutesBeforeMarketClose,
           buyStrategy,
-          sellStrategy
+          sellStrategy,
+          startingPortfolioBalance,
+          maxPositionPerTrade
         )
       )
     )
@@ -54,7 +60,9 @@ router.post('/', async (req, res) => {
         !symbol ||
         !closeOutNMinutesBeforeMarketClose ||
         !buyStrategy ||
-        !sellStrategy
+        !sellStrategy ||
+        !startingPortfolioBalance ||
+        !maxPositionPerTrade
       ) {
         throw new Error('Required params are missing')
       }
@@ -72,7 +80,9 @@ router.post('/', async (req, res) => {
               quantity: smaSell, // TODO: make these quantities configurable
               closeOutNMinutesBeforeMarketClose
             },
-            symbol
+            symbol,
+            startingPortfolioBalance,
+            maxPositionPerTrade
           )
 
           const buildStrategyRun = {
@@ -99,7 +109,9 @@ router.post('/', async (req, res) => {
           symbol,
           closeOutNMinutesBeforeMarketClose,
           buyStrategy,
-          sellStrategy
+          sellStrategy,
+          startingPortfolioBalance,
+          maxPositionPerTrade
         ),
         JSON.stringify(overallRuns)
       )

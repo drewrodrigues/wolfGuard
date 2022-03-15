@@ -46,6 +46,7 @@ export interface IBuyOrder {
   buyBarIndex: number
   openingRange: { lowBar: Bar; highBar: Bar }
   value: number
+  lotSize: number
 }
 
 export interface IOrderSummary {
@@ -75,6 +76,10 @@ export interface IOverallSummary {
   biggestLoss: number
   averagePosition: number
   averageValuePerDay: number
+  highestPortfolioBalance: number
+  lowestPortfolioBalance: number
+  portfolioBalance: number
+  return: number
 }
 
 export interface IRunStrategyResult {
