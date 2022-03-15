@@ -51,7 +51,6 @@ export function Strategy() {
       }
     })
 
-    console.log({ strategyRun })
     setResults(strategyRun)
   }
 

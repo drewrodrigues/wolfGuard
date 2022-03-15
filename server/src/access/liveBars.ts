@@ -95,3 +95,9 @@ export async function liveBars(updateCallback: (bars: LiveBarUpdate) => any) {
     true
   )
 }
+
+export async function stopLiveBars() {
+  const ib = await initConnection()
+  ib.removeAllListeners(EventName.historicalData)
+  ib.removeAllListeners(EventName.historicalDataUpdate)
+}

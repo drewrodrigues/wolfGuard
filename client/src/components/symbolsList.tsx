@@ -11,8 +11,6 @@ export function SymbolsList() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  console.log({ data: _useRequest.data })
-
   return (
     <main>
       {_useRequest.requestStatus === 'success' ? (
