@@ -92,7 +92,6 @@ export interface IStrategy {
     symbol: number
     orbBuyDuration: number
     smaSellDuration: number
-    lotSize: number
   }
 }
 

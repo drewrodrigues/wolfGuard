@@ -15,8 +15,9 @@ export function Strategy() {
 
   const [results, setResults] = useState<IStrategyResponse>([])
 
+  const [portfolioStartingValue, setPortfolioStartingValue] = useState(50000)
+  const [maxPositionPerTrade, setMaxPositionPerTrade] = useState(1000)
   const [symbol, setSymbol] = useState<string>('MSFT')
-  // TODO implement
   const [
     closeOutNMinutesBeforeMarketClose,
     setCloseOutNMinutesBeforeMarketClose
@@ -27,8 +28,6 @@ export function Strategy() {
   const [selectedSellStrategy, setSelectedSellStrategy] = useState<
     SellStrategyType | undefined
   >('SMA Drop')
-
-  console.log(selectedBuyStrategy)
 
   useEffect(() => {
     requestSymbols.call('/symbols')
@@ -43,7 +42,6 @@ export function Strategy() {
       method: 'POST',
       data: {
         symbol,
-        lotSize: 100,
         closeOutNMinutesBeforeMarketClose,
         buyStrategy: selectedBuyStrategy,
         sellStrategy: selectedSellStrategy
@@ -57,7 +55,33 @@ export function Strategy() {
   return (
     <>
       <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px] bg-[#333] border-stone-700">
+        <h4 className="text-white mb-[5px] font-bold text-[22px]">Portfolio</h4>
+
+        <h5 className="text-white mb-[5px] text-[14px]">Starting Value</h5>
+        <input
+          type="text"
+          className="p-[5px] mb-[10px]"
+          value={portfolioStartingValue}
+          onChange={(e) => setPortfolioStartingValue(parseInt(e.target.value))}
+        />
+
+        <h5 className="text-white mb-[5px] text-[14px]">
+          Max Position per Trade
+        </h5>
+        <input
+          type="text"
+          className="p-[5px]"
+          value={maxPositionPerTrade}
+          onChange={(e) => setMaxPositionPerTrade(parseInt(e.target.value))}
+        />
+      </section>
+
+      <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px] bg-[#333] border-stone-700">
         <main>
+          <h4 className="text-white mb-[5px] font-bold text-[22px]">
+            Entry & Exit
+          </h4>
+
           <section className="flex justify-between mb-[20px]">
             <div>
               <h4 className="text-white mb-[5px] font-bold text-[14px]">

@@ -6,12 +6,11 @@ const router = express.Router()
 
 function cacheKey(
   symbol: string,
-  lotSize: string,
   closeOutNMinutesBeforeMarketClose: number,
   buyStrategy: string,
   sellStrategy: string
 ) {
-  return `symbol=${symbol}-lotSize=${lotSize}-closeOutNMinutesBeforeMarketClose=${closeOutNMinutesBeforeMarketClose}-buyStrategy=${buyStrategy}-sellStrategy=${sellStrategy}`
+  return `symbol=${symbol}-closeOutNMinutesBeforeMarketClose=${closeOutNMinutesBeforeMarketClose}-buyStrategy=${buyStrategy}-sellStrategy=${sellStrategy}`
 }
 
 const ORB_BUY_DURATIONS = [1, 5, 10, 15, 30]
@@ -24,7 +23,6 @@ router.post('/', async (req, res) => {
   // TODO to chart this)
   const {
     symbol,
-    lotSize,
     closeOutNMinutesBeforeMarketClose,
     buyStrategy,
     sellStrategy
@@ -36,7 +34,6 @@ router.post('/', async (req, res) => {
       cache.get(
         cacheKey(
           symbol,
-          lotSize,
           closeOutNMinutesBeforeMarketClose,
           buyStrategy,
           sellStrategy
@@ -55,7 +52,6 @@ router.post('/', async (req, res) => {
     try {
       if (
         !symbol ||
-        !lotSize ||
         !closeOutNMinutesBeforeMarketClose ||
         !buyStrategy ||
         !sellStrategy
@@ -76,34 +72,31 @@ router.post('/', async (req, res) => {
               quantity: smaSell, // TODO: make these quantities configurable
               closeOutNMinutesBeforeMarketClose
             },
-            symbol,
-            lotSize
+            symbol
           )
 
-          const builtStrageyRun = {
+          const buildStrategyRun = {
             strategyResult,
             ...{
               setup: {
                 symbol,
                 orbBuyDuration: orbBuy,
-                smaSellDuration: smaSell,
-                lotSize
+                smaSellDuration: smaSell
               }
             }
           }
           const buySellCombinationRun: IStrategy = {
             buyStrategy: orbBuy,
             sellStrategy: smaSell,
-            ...builtStrageyRun
+            ...buildStrategyRun
           }
-          overallRuns.push({ ...builtStrageyRun, ...buySellCombinationRun })
+          overallRuns.push({ ...buildStrategyRun, ...buySellCombinationRun })
         }
       }
 
       cache.put(
         cacheKey(
           symbol,
-          lotSize,
           closeOutNMinutesBeforeMarketClose,
           buyStrategy,
           sellStrategy

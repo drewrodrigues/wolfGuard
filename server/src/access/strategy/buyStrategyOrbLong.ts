@@ -7,7 +7,6 @@ import { IBuyOrder } from '../../../../common'
 export function buyStrategyOrbLong(
   bars: Bar[],
   duration: number,
-  lotSize: number,
   enterWithinNMinutes: number = 120
 ): IBuyOrder | null {
   const openingBars = bars.slice(0, duration)
@@ -44,7 +43,8 @@ export function buyStrategyOrbLong(
           lowBar: openingRangeLowBar,
           highBar: openingRangeHighBar
         },
-        value: bar.open * lotSize // ! this is technically not correct
+        // TODO: implement based on maxPositionPerTrade
+        value: bar.open // ! this is technically not correct
       }
     }
   }

@@ -35,8 +35,7 @@ interface RunStrategySellCondition {
 export async function runStrategy(
   buyCondition: RunStrategyBuyCondition,
   sellCondition: RunStrategySellCondition,
-  symbol: string,
-  lotSize: number
+  symbol: string
 ): Promise<IRunStrategyResult[]> {
   const bars = await db.bar.findMany({
     where: { symbol: symbol },
@@ -80,7 +79,7 @@ export async function runStrategy(
 
     let buyOrder: IBuyOrder | null = null
     if (buyCondition.strategy === 'ORB Long') {
-      buyOrder = buyStrategyOrbLong(barsToday, buyCondition.quantity, lotSize)
+      buyOrder = buyStrategyOrbLong(barsToday, buyCondition.quantity)
     } else {
       throw new Error(
         `BuyCondition strategy not implemented: ${buyCondition.strategy}`
@@ -98,8 +97,7 @@ export async function runStrategy(
         sellOrder = sellStrategySmaDrop(
           barsToday,
           sellCondition.quantity,
-          buyOrder.buyBarIndex,
-          lotSize
+          buyOrder.buyBarIndex
         )
       } else {
         throw new Error(
@@ -111,8 +109,7 @@ export async function runStrategy(
         sellOrder = sellStrategyBeforeMarketClose(
           barsToday,
           sellCondition.closeOutNMinutesBeforeMarketClose,
-          buyOrder.buyBarIndex,
-          lotSize
+          buyOrder.buyBarIndex
         )
       }
 

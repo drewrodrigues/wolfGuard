@@ -5,8 +5,7 @@ import { BARS_IN_DAY } from '../strategy'
 export function sellStrategyBeforeMarketClose(
   bars: Bar[],
   minutesToSellBeforeMarketClose: number,
-  buyBarIndex: number,
-  lotSize: number
+  buyBarIndex: number
 ): ISellOrder {
   if (
     minutesToSellBeforeMarketClose < 1 ||
@@ -28,7 +27,8 @@ export function sellStrategyBeforeMarketClose(
 
   return {
     bar: closingBar,
-    value: closingBar.open * lotSize,
+    value: 5, // TODO: implement (based on maxPositionPerTrade)
+    // value: closingBar.open * lotSize,
     type: 'close-out'
   }
 }
