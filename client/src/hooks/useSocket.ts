@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 // ? difference between io & socket?
+
 const socket = io('http://localhost:3000')
 
 type SocketStatus = 'disconnected' | 'connected'
@@ -35,6 +36,14 @@ export function useSocket() {
     } else {
       console.log('Socket (attempting connection)')
       socket.connect()
+    }
+
+    return () => {
+      console.log(
+        'Component unmounting. Removing all listeners & disconnecting socket'
+      )
+      socket.removeAllListeners()
+      socket.disconnect()
     }
   }, [])
 
