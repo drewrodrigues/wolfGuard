@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useRequest } from '../hooks/request'
 
-export function BarsCache() {
+export function CacheView() {
   const _useRequest = useRequest()
   const [symbol, setSymbol] = useState('')
   const [exchange, setExchange] = useState('SMART')

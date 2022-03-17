@@ -12,6 +12,7 @@ const ROUTES = [
     path: '/strategy'
   },
   { title: 'Cache', path: '/cache' },
+  { title: 'History', path: '/history' },
   { title: 'Trader', path: '/trader' }
 ]
 

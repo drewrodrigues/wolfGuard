@@ -6,10 +6,10 @@ import {
   SellStrategyType
 } from '../../../common'
 import { useRequest } from '../hooks/request'
-import { OptionGroup } from './shared/optionGroup'
-import { StrategyResponse } from './strategyResponse'
+import { OptionGroup } from '../components/shared/optionGroup'
+import { StrategyResponse } from '../components/strategyResponse'
 
-export function Strategy() {
+export function StrategyView() {
   const requestSymbols = useRequest<{ symbol: string }[]>()
   const runStrategy = useRequest<IStrategyResponse>()
 

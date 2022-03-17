@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react'
 import { Bar } from 'react-chartjs-2'
 import { LiveBar, OpenOrder, OpenPosition } from '../../../common'
 import { useSocket } from '../hooks/useSocket'
-import { dollarFormatter } from './strategyResponse'
+import { dollarFormatter } from '../components/strategyResponse'
 
 const CARD_STYLES =
   'mb-[20px] bg-[#333] shadow-md border border-stone-700 p-[20px] rounded-[5px]'
@@ -21,7 +21,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip)
 const MARKET_OPEN = moment('9:30am', 'h:mma')
 const MARKET_CLOSE = moment('4:00pm', 'h:mma')
 
-export function Trader() {
+export function TraderView() {
   const [liveData, setLiveData] = useState<{
     // TODO: pull to common to use for socket and client
     bars: LiveBar[]
