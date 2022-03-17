@@ -8,6 +8,7 @@ import {
 } from 'chart.js'
 import { useRequest } from '../hooks/request'
 import { Bar } from 'react-chartjs-2'
+import { Card } from '../components/shared/card'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip)
 
@@ -40,20 +41,22 @@ export function HistoryView() {
 
   return (
     <>
-      {data && (
-        <Bar
-          data={data}
-          options={{
-            scales: {
-              x: { display: false },
-              y: {
-                beginAtZero: false,
-                grid: { drawBorder: true, color: '#777' }
+      <Card>
+        {data && (
+          <Bar
+            data={data}
+            options={{
+              scales: {
+                x: { display: false },
+                y: {
+                  beginAtZero: false,
+                  grid: { drawBorder: true, color: '#777' }
+                }
               }
-            }
-          }}
-        />
-      )}
+            }}
+          />
+        )}
+      </Card>
     </>
   )
 }

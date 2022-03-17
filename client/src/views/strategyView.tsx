@@ -8,6 +8,7 @@ import {
 import { useRequest } from '../hooks/request'
 import { OptionGroup } from '../components/shared/optionGroup'
 import { StrategyResponse } from '../components/strategyResponse'
+import { Card } from '../components/shared/card'
 
 export function StrategyView() {
   const requestSymbols = useRequest<{ symbol: string }[]>()
@@ -56,7 +57,7 @@ export function StrategyView() {
 
   return (
     <>
-      <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px] bg-[#333] border-stone-700">
+      <Card>
         <h4 className="text-white mb-[5px] font-bold text-[22px]">Portfolio</h4>
 
         <h5 className="text-white mb-[5px] text-[14px]">Starting Value</h5>
@@ -78,9 +79,9 @@ export function StrategyView() {
           value={maxPositionPerTrade}
           onChange={(e) => setMaxPositionPerTrade(parseInt(e.target.value))}
         />
-      </section>
+      </Card>
 
-      <section className="shadow-md border p-[20px] mb-[10px] rounded-[5px] bg-[#333] border-stone-700">
+      <Card>
         <main>
           <h4 className="text-white mb-[5px] font-bold text-[22px]">
             Entry & Exit
@@ -157,7 +158,7 @@ export function StrategyView() {
             ? 'Running All Combination...'
             : 'Run All Combinations'}
         </button>
-      </section>
+      </Card>
 
       {results.length > 0 && (
         <section className="mb-[10px]">

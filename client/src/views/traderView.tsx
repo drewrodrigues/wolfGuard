@@ -12,9 +12,7 @@ import { Bar } from 'react-chartjs-2'
 import { LiveBar, OpenOrder, OpenPosition } from '../../../common'
 import { useSocket } from '../hooks/useSocket'
 import { dollarFormatter } from '../components/strategyResponse'
-
-const CARD_STYLES =
-  'mb-[20px] bg-[#333] shadow-md border border-stone-700 p-[20px] rounded-[5px]'
+import { Card } from '../components/shared/card'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip)
 
@@ -115,7 +113,7 @@ export function TraderView() {
       </header>
 
       <h2 className="font-bold text-white mb-[10px]">Strategy</h2>
-      <div className={`${CARD_STYLES} text-white`}>
+      <Card>
         {liveData.hasBuySignal !== undefined && (
           <p>
             Buy signal:{' '}
@@ -135,12 +133,12 @@ export function TraderView() {
         <p>
           Status: <span className="font-bold">{liveData.dayTradingStatus}</span>
         </p>
-      </div>
+      </Card>
 
       {liveData.openPositions.length > 0 && (
         <>
           <h2 className="font-bold text-white mb-[10px]">Open Positions</h2>
-          <div className={`${CARD_STYLES} text-white`}>
+          <Card>
             {/* // TODO: color based upon current position */}
             {liveData.openPositions.map((position) => (
               <div
@@ -153,7 +151,6 @@ export function TraderView() {
                   {position.averageCost &&
                     ` ${dollarFormatter.format(position.averageCost)}`}
                 </p>
-
                 {position.averageCost && (
                   <p>
                     {dollarFormatter.format(
@@ -163,14 +160,14 @@ export function TraderView() {
                 )}
               </div>
             ))}
-          </div>
+          </Card>
         </>
       )}
 
       {liveData.openOrders.length > 0 && (
         <>
           <h2 className="font-bold text-white mb-[10px]">Open Orders</h2>
-          <div className={`${CARD_STYLES} text-white`}>
+          <Card>
             {liveData.openOrders.map((openOrder) => (
               <div
                 className={classNames(
@@ -202,7 +199,7 @@ export function TraderView() {
                 )}
               </div>
             ))}
-          </div>
+          </Card>
         </>
       )}
 
