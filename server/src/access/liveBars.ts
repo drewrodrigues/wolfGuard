@@ -50,8 +50,6 @@ export async function startLiveBars(
           type: '1 min',
           exchange: 'SMART'
         }
-      } else {
-        console.log('Finished bar, not storing')
       }
     }
   )

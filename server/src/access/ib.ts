@@ -24,7 +24,6 @@ export function initConnection(): Promise<IBApi> {
       })
       ib.connect()
     } else {
-      console.log('ib initConnection(): Already connected')
       resolve(ib)
     }
   })

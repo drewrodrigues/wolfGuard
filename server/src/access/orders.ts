@@ -31,28 +31,37 @@ export async function getOpenOrders(): Promise<OpenOrder[]> {
   })
 }
 
-export async function getPositions(): Promise<OpenPosition[]> {
+export async function getPositions(): Promise<{
+  open: OpenPosition[]
+  closed: OpenPosition[]
+}> {
   const ib = await initConnection()
   return new Promise((resolve) => {
     const openPositions: Record<string, OpenPosition> = {}
+    const closedPositions: Record<string, OpenPosition> = {}
 
     function addOpenPosition(...args: any[]) {
-      const positionClosed = args[2] === 0
-      if (positionClosed) return
-
       const openPosition: OpenPosition = {
         account: args[0],
         contract: args[1],
         lotSize: args[2],
         averageCost: args[3]
       }
-      openPositions[args[1].conId!] = openPosition
+      const positionClosed = args[2] === 0
+      if (positionClosed) {
+        closedPositions[args[1].conId!] = openPosition
+      } else {
+        openPositions[args[1].conId!] = openPosition
+      }
     }
 
     function finishOpenPositions() {
       ib.removeListener(EventName.position, addOpenPosition)
       ib.removeListener(EventName.positionEnd, finishOpenPositions)
-      resolve(Object.values(openPositions))
+      resolve({
+        open: Object.values(openPositions),
+        closed: Object.values(closedPositions)
+      })
     }
 
     ib.on(EventName.position, addOpenPosition)

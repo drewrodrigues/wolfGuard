@@ -1,28 +1,34 @@
-import { LiveBar } from '../../../../common'
+import { IBuyOrder, LiveBar } from '../../../../common'
 
 // buy after n bars increase on close
 export function buyStrategyIncreasingBars(
   bars: LiveBar[],
-  nBars: number
-): boolean {
+  nBars: number,
+  maxPositionPerTrade: number
+): IBuyOrder | null {
   if (nBars < 2) throw new Error('Cannot buy increasing bars with n < 2')
-  const nPreviousBars = bars.slice(bars.length - nBars, bars.length)
+  // * exclude current bar as it hasn't closed yet
+  const nPreviousBars = bars.slice(bars.length - nBars - 1, bars.length - 1)
+
   if (nPreviousBars.length < nBars) {
-    throw new Error('Not enough data')
+    return null
   }
 
   for (let i = 1; i < nPreviousBars.length; i++) {
-    const [previousBar, currentBar] = [bars[i - 1], bars[i]]
-
-    console.log({
-      previousClose: previousBar.close,
-      currentClose: currentBar.close
-    })
+    const [previousBar, currentBar] = [nPreviousBars[i - 1], nPreviousBars[i]]
 
     if (previousBar.close > currentBar.close) {
-      return false
+      return null
     }
   }
   // all are increasing
-  return true
+  const barToBuyAt = nPreviousBars[nPreviousBars.length - 1]
+
+  return {
+    bar: barToBuyAt,
+    buyBarIndex: nPreviousBars.length - 1,
+    value: barToBuyAt.close,
+    lotSize: Math.floor(maxPositionPerTrade / barToBuyAt.close),
+    signalDetail: JSON.stringify(nPreviousBars)
+  }
 }

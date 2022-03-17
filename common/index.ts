@@ -48,11 +48,18 @@ export interface ISellOrder {
 }
 
 export interface IBuyOrder {
-  bar: Bar
+  bar: Bar | LiveBar
   buyBarIndex: number
-  openingRange: { lowBar: Bar; highBar: Bar }
+  // TODO: pull this into another type (then don't destructure props so we keep typing)
+  openingRange?: { highBar: Bar }
   value: number
+  // ? not sure that this function should determine the lot size
+  // ? maybe it just returns what we should buy at
+  // ? then the enclosing function determines what lot size we need
   lotSize: number
+
+  // stringify bars so I can look at them
+  signalDetail?: string
 }
 
 export interface IOrderSummary {
