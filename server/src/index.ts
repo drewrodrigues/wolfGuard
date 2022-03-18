@@ -15,9 +15,14 @@ import { barsController } from './controllers/barsController'
 import { strategyController } from './controllers/strategyController'
 import { symbolsController } from './controllers/symbolsController'
 import { traderController } from './controllers/traderController'
-import { buyOrder } from './utils/buyOrder'
+import { buyOrder } from './access/buyOrder'
 import { getDayTradingStatus } from './utils/getDayTradingStatus'
-import { sellOrder } from './utils/sellOrder'
+import { sellOrder } from './access/sellOrder'
+import {
+  liveOrderTracking_Accepted,
+  liveOrderTracking_Executed,
+  liveOrderTracking_Send
+} from './access/liveOrderTracking'
 
 const app = express()
 const server = http.createServer(app)
@@ -46,6 +51,10 @@ app.use('/trader', traderController)
 // * show up in `openOrders` for a moment
 let buyOrderInFlight = false
 let sellOrderInFlight = false
+
+// ! improve this logic, it's trash
+let liveBuyOrderTrackingIds: number[] = []
+let liveSellOrderTrackingIds: number[] = []
 
 io.on('connection', async (socket) => {
   console.log('a socket connected with id=', socket.id)
@@ -98,61 +107,35 @@ io.on('connection', async (socket) => {
     ) {
       buyOrderInFlight = true
       console.log('Placing buy order at: ', hasBuySignal)
-      const orderSendTime = new Date()
 
-      let liveOrderId: number
-      db.liveTrade
-        .create({
-          data: {
-            symbol: hasBuySignal.bar.symbol,
-            type: 'BUY',
-            time: hasBuySignal.bar.time,
-            open: hasBuySignal.bar.open,
-            high: hasBuySignal.bar.high,
-            low: hasBuySignal.bar.low,
-            close: hasBuySignal.bar.close,
-            volume: hasBuySignal.bar.volume,
-            exchange: 'UNKNOWN', // TODO: actually set me
-            // reasoning
-            strategy: 'IncreasingBars',
-            signalReasoning: hasBuySignal.signalReasoning!,
-            orderDetails: null, // once the order goes through, we'll fill this
-            orderSendTime,
-            // TODO: get these filled
-            orderAcceptedTime: null,
-            orderExecutedTime: null
-          }
-        })
-        .then((record) => {
-          liveOrderId = record.id
-          console.log('liveTrade record created')
-        })
-        .catch(() => {
-          console.error('liveTrade record failed to be created')
-        })
+      liveOrderTracking_Send(hasBuySignal, 'BUY').then((number) => {
+        liveBuyOrderTrackingIds.push(number)
+      })
 
       buyOrder(hasBuySignal.bar.close, hasBuySignal.lotSize, SELECTED_SYMBOL)
         .then(async (orderDetails) => {
-          console.log('buyOrder accepted: updating liveTrade acceptedTime')
-          try {
-            await db.liveTrade.update({
-              where: { id: liveOrderId },
-              data: {
-                orderAcceptedTime: new Date(),
-                orderDetails: JSON.stringify(orderDetails)
-              }
-            })
-            console.log('buyOrder accepted: updated liveTrade acceptedTime')
-          } catch (e) {
-            console.error('Failed to update liveTrade')
-          }
+          if (!liveBuyOrderTrackingIds.length)
+            throw new Error('Live order tracking not stored yet')
+          const lastLiveOrderTrackingId =
+            liveBuyOrderTrackingIds[liveBuyOrderTrackingIds.length - 1]
+          liveOrderTracking_Accepted(lastLiveOrderTrackingId, orderDetails)
         })
         .catch(() => {
+          // ! add a timeout and clear orders if it isn't filled after a period of time
           console.error('buyOrder failed')
         })
     }
 
     const openPosition = positions.open[0]
+
+    if (openPosition && liveBuyOrderTrackingIds.length) {
+      console.log('Tracking liveOrderBuy execution')
+      const lastLiveOrderTrackingId = liveBuyOrderTrackingIds.pop()
+      liveOrderTracking_Executed(lastLiveOrderTrackingId!).catch(() => {
+        console.error('Failed to track liveOrderTracking_Executed')
+      })
+    }
+
     let hasSellSignal = undefined
     if (openPosition && !sellOrderInFlight) {
       hasSellSignal = sellStrategyDecreasingBars(
@@ -161,6 +144,9 @@ io.on('connection', async (socket) => {
         openPosition.lotSize
       )
 
+      // ! bug with buyOrder in flight when it's not (having to reset server)
+      // ! we need a nother reset (probably when execution is tracked)
+      // ? or see if there's an event we can hook into
       const shouldOrder =
         hasSellSignal &&
         !sellOrderInFlight &&
@@ -178,7 +164,11 @@ io.on('connection', async (socket) => {
       if (shouldOrder && hasSellSignal) {
         console.log('Opening sell order: ', hasSellSignal)
         sellOrderInFlight = true
-        sellOrder(hasSellSignal.bar.close, hasSellSignal.lotSize)
+        sellOrder(
+          hasSellSignal.bar.close,
+          hasSellSignal.lotSize,
+          SELECTED_SYMBOL
+        )
       }
     }
 
