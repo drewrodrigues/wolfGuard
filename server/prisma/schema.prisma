@@ -21,3 +21,26 @@ model Bar {
 
   @@unique([symbol, time, type])
 }
+
+model LiveTrade {
+  id       Int      @id @default(autoincrement())
+  symbol   String
+  type     String
+  time     DateTime
+  open     Float
+  high     Float
+  low      Float
+  close    Float
+  volume   Float
+  exchange String
+
+  // order reasoning
+  strategy        String
+  signalReasoning String
+  orderDetails    String
+
+  // performance analytics
+  orderSendTime     DateTime // initial send
+  orderAcceptedTime DateTime // order opened
+  orderExecutedTime DateTime // order executed
+}
