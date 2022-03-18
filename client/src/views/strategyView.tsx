@@ -63,7 +63,7 @@ export function StrategyView() {
         <h5 className="text-white mb-[5px] text-[14px]">Starting Value</h5>
         <input
           type="text"
-          className="p-[5px] mb-[10px]"
+          className="p-[5px] mb-[10px] text-black"
           value={startingPortfolioBalance}
           onChange={(e) =>
             setStartingPortfolioBalance(parseInt(e.target.value))
@@ -75,7 +75,7 @@ export function StrategyView() {
         </h5>
         <input
           type="text"
-          className="p-[5px]"
+          className="p-[5px] text-black"
           value={maxPositionPerTrade}
           onChange={(e) => setMaxPositionPerTrade(parseInt(e.target.value))}
         />
