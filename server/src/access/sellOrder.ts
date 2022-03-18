@@ -6,15 +6,19 @@ import {
   OrderType,
   SecType
 } from '@stoqey/ib'
-import { initConnection } from '../access/ib'
+import { initConnection } from './ib'
 
-export async function sellOrder(exitPrice: number, lotSize: number) {
+export async function sellOrder(
+  exitPrice: number,
+  lotSize: number,
+  symbol: string
+) {
   const ib = await initConnection()
 
   return new Promise((resolve) => {
     ib.once(EventName.nextValidId, (orderId: number) => {
       const contract: Contract = {
-        symbol: 'BYND', // TODO: fix to pick correct symbol
+        symbol: symbol, // TODO: fix to pick correct symbol
         exchange: 'SMART',
         currency: 'USD',
         secType: SecType.STK
