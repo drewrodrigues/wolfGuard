@@ -34,6 +34,14 @@ model LiveTrade {
   volume   Float
   exchange String
 
+  action String
+
+  // TODO: add way to associate entry/exit
+
+  // TODO: add column to reflect current price action
+  // ? so we can see how far away our order fill is from price action
+  // ? based on order type
+
   // order reasoning
   strategy        String
   signalReasoning String
