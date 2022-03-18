@@ -58,7 +58,9 @@ io.on('connection', async (socket) => {
   // then keep in sync?
   // TODO: send these to the client -- and also store them in memory
 
-  startLiveBars(async (update) => {
+  const SELECTED_SYMBOL = 'BYND'
+
+  startLiveBars(SELECTED_SYMBOL, async (update) => {
     const openOrders = await getOpenOrders()
     const positions = await getPositions()
 

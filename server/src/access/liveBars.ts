@@ -17,6 +17,7 @@ interface LiveBarUpdate {
 }
 
 export async function startLiveBars(
+  symbol: string,
   updateCallback: (bars: LiveBarUpdate) => void
 ) {
   // TODO: build historical bars first and then chain up bar updates (send as object so we keep unique times)
@@ -24,7 +25,7 @@ export async function startLiveBars(
 
   const ib = await initConnection()
   const contract: Contract = {
-    symbol: 'BYND', // should be MSFT for now // TODO: fix me
+    symbol: symbol,
     exchange: 'SMART',
     currency: 'USD',
     secType: SecType.STK
@@ -46,7 +47,7 @@ export async function startLiveBars(
           low,
           close,
           volume,
-          symbol: 'MSFT',
+          symbol,
           type: '1 min',
           exchange: 'SMART'
         }
@@ -64,7 +65,7 @@ export async function startLiveBars(
         low,
         close,
         volume,
-        symbol: 'MSFT',
+        symbol,
         type: '1 min',
         exchange: 'SMART'
       }
