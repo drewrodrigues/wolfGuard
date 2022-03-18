@@ -33,6 +33,6 @@ export function sellStrategyDecreasingBars(
     buyBarIndex: nPreviousBars.length - 1,
     value: barToSellAt.close,
     lotSize,
-    signalDetail: JSON.stringify(nPreviousBars)
+    signalReasoning: JSON.stringify(nPreviousBars)
   }
 }

@@ -37,10 +37,10 @@ model LiveTrade {
   // order reasoning
   strategy        String
   signalReasoning String
-  orderDetails    String
+  orderDetails    String?
 
   // performance analytics
   orderSendTime     DateTime // initial send
-  orderAcceptedTime DateTime // order opened
-  orderExecutedTime DateTime // order executed
+  orderAcceptedTime DateTime? // order opened
+  orderExecutedTime DateTime? // order executed
 }

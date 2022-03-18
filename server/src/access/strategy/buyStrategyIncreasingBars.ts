@@ -29,6 +29,6 @@ export function buyStrategyIncreasingBars(
     buyBarIndex: nPreviousBars.length - 1,
     value: barToBuyAt.close,
     lotSize: Math.floor(maxPositionPerTrade / barToBuyAt.close),
-    signalDetail: JSON.stringify(nPreviousBars)
+    signalReasoning: JSON.stringify(nPreviousBars)
   }
 }

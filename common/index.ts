@@ -59,7 +59,7 @@ export interface IBuyOrder {
   lotSize: number
 
   // stringify bars so I can look at them
-  signalDetail?: string
+  signalReasoning?: string
 }
 
 export interface IOrderSummary {

@@ -96,11 +96,58 @@ io.on('connection', async (socket) => {
     ) {
       buyOrderInFlight = true
       console.log('Placing buy order at: ', hasBuySignal)
-      // TODO: buy at current bars price (which will be close?)
-      // db.liveTradingOrder.create({
-      //   data: { symbol: hasBuySignal.bar.symbol, time: hasBuySignal.bar.time, barsDetail: }
-      // })
-      buyOrder(hasBuySignal.bar.close, hasBuySignal.lotSize)
+      const orderSendTime = new Date()
+
+      let liveOrderId: number
+      db.liveTrade
+        .create({
+          data: {
+            symbol: hasBuySignal.bar.symbol,
+            type: 'BUY',
+            time: hasBuySignal.bar.time,
+            open: hasBuySignal.bar.open,
+            high: hasBuySignal.bar.high,
+            low: hasBuySignal.bar.low,
+            close: hasBuySignal.bar.close,
+            volume: hasBuySignal.bar.volume,
+            exchange: 'UNKNOWN', // TODO: actually set me
+            // reasoning
+            strategy: 'IncreasingBars',
+            signalReasoning: hasBuySignal.signalReasoning!,
+            orderDetails: null, // once the order goes through, we'll fill this
+            orderSendTime,
+            // TODO: get these filled
+            orderAcceptedTime: null,
+            orderExecutedTime: null
+          }
+        })
+        .then((record) => {
+          liveOrderId = record.id
+          console.log('liveTrade record created')
+        })
+        .catch(() => {
+          console.error('liveTrade record failed to be created')
+        })
+
+      buyOrder(hasBuySignal.bar.close, hasBuySignal.lotSize, SELECTED_SYMBOL)
+        .then(async (orderDetails) => {
+          console.log('buyOrder accepted: updating liveTrade acceptedTime')
+          try {
+            await db.liveTrade.update({
+              where: { id: liveOrderId },
+              data: {
+                orderAcceptedTime: new Date(),
+                orderDetails: JSON.stringify(orderDetails)
+              }
+            })
+            console.log('buyOrder accepted: updated liveTrade acceptedTime')
+          } catch (e) {
+            console.error('Failed to update liveTrade')
+          }
+        })
+        .catch(() => {
+          console.error('buyOrder failed')
+        })
     }
 
     const openPosition = positions.open[0]
