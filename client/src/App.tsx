@@ -22,7 +22,7 @@ function App() {
       <div className="mx-[20px]">
         <nav className="flex justify-between items-center py-[20px] text-white">
           <Link to="/" className="font-bold">
-            SmartTrader
+            Wolf Guard
           </Link>
 
           <aside className="text-[14px]">
