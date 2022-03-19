@@ -5,6 +5,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "db:dump": "pg_dump smarttraderdev > bars_dump.txt",
+    "db:load": "psql smarttraderdev < bars_dump.txt",
     "prisma:migrate:dev": "npx prisma migrate dev --name",
     "prisma:studio": "prisma studio",
     "start": "ts-node src/index.ts",

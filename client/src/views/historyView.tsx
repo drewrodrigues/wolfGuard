@@ -1,16 +1,7 @@
 import React, { useEffect } from 'react'
-import {
-  BarElement,
-  CategoryScale,
-  Chart as ChartJS,
-  LinearScale,
-  Tooltip
-} from 'chart.js'
 import { useRequest } from '../hooks/request'
-import { Bar } from 'react-chartjs-2'
 import { Card } from '../components/shared/card'
-
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip)
+import HistoryChart from '../components/historyChart'
 
 // TODO: get the last day of data and display it
 export function HistoryView() {
@@ -19,44 +10,17 @@ export function HistoryView() {
 
   useEffect(() => {
     historicalBarsRequest.call(
-      `/bars/MSFT?startDate='2020-12-28'&endDate='2020-12-29'`
+      `/bars/MSFT?startDate='2021-12-27'&endDate='2021-12-30'`
     )
   }, [])
 
-  let data
-
-  if (historicalBarsRequest.requestStatus === 'success') {
-    data = {
-      labels: historicalBarsRequest.data.bars.map((bar) => bar.time),
-      datasets: [
-        {
-          data: Object.values(historicalBarsRequest.data.bars).map(
-            (liveBar) => liveBar.close
-          ),
-          backgroundColor: 'rgb(248 113 113)'
-        }
-      ]
-    }
-  }
-
   return (
     <>
-      <Card>
-        {data && (
-          <Bar
-            data={data}
-            options={{
-              scales: {
-                x: { display: false },
-                y: {
-                  beginAtZero: false,
-                  grid: { drawBorder: true, color: '#777' }
-                }
-              }
-            }}
-          />
-        )}
-      </Card>
+      {historicalBarsRequest.requestStatus === 'success' && (
+        <Card>
+          <HistoryChart data={historicalBarsRequest.data.bars} />
+        </Card>
+      )}
     </>
   )
 }
