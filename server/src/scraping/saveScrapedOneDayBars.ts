@@ -48,13 +48,8 @@ async function createBars() {
   }
 }
 
-const timer = keepAlive()
-
 createBars()
   .then(() => {
     console.log('Done creating bars')
   })
   .catch((e) => console.error(e))
-  .finally(() => {
-    clearInterval(timer)
-  })
