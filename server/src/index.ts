@@ -178,7 +178,11 @@ io.on('connection', async (socket) => {
       if (shouldOrder && hasSellSignal) {
         console.log('Opening sell order: ', hasSellSignal)
         sellOrderInFlight = true
-        sellOrder(hasSellSignal.bar.close, hasSellSignal.lotSize)
+        sellOrder(
+          hasSellSignal.bar.close,
+          hasSellSignal.lotSize,
+          SELECTED_SYMBOL
+        )
       }
     }
 
