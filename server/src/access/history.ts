@@ -61,7 +61,8 @@ export async function getHistoricalData(contract: Contract): Promise<any[]> {
             close,
             volume,
             type: BarSizeSetting.MINUTES_ONE,
-            exchange: contract.exchange!
+            exchange: contract.exchange!,
+            dataSource: 'IBKR'
           }
           bars.push(newBar)
         } else {

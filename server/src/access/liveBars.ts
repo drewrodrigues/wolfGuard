@@ -49,7 +49,8 @@ export async function startLiveBars(
           volume,
           symbol,
           type: '1 min',
-          exchange: 'SMART'
+          exchange: 'SMART',
+          dataSource: null
         }
       }
     }
@@ -67,7 +68,8 @@ export async function startLiveBars(
         volume,
         symbol,
         type: '1 min',
-        exchange: 'SMART'
+        exchange: 'SMART',
+        dataSource: null
       }
       const sortedBars = sortBars(bars)
       const recentBars = sortedBars.slice(
