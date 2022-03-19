@@ -37,6 +37,7 @@ Technologies used:
 - Install yarn: `npm install -g yarn`
 - Install brew
 - Run `brew install psql` (this is a command line interface for interacting with a postgres db)
+- Seed your db by running `yarn db:seed` from `/server`
 
 # Running the Project
 
