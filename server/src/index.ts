@@ -15,9 +15,9 @@ import { barsController } from './controllers/barsController'
 import { strategyController } from './controllers/strategyController'
 import { symbolsController } from './controllers/symbolsController'
 import { traderController } from './controllers/traderController'
-import { buyOrder } from './utils/buyOrder'
+import { buyOrder } from './access/buyOrder'
 import { getDayTradingStatus } from './utils/getDayTradingStatus'
-import { sellOrder } from './utils/sellOrder'
+import { sellOrder } from './access/sellOrder'
 
 const app = express()
 const server = http.createServer(app)
