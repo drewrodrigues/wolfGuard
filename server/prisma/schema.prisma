@@ -33,7 +33,7 @@ model LiveTrade {
   low      Float
   close    Float
   volume   Float
-  exchange String
+  exchange String?
 
   action String
 

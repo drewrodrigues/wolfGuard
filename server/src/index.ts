@@ -105,14 +105,14 @@ io.on('connection', async (socket) => {
         .create({
           data: {
             symbol: hasBuySignal.bar.symbol,
-            type: 'BUY',
+            type: hasBuySignal.bar.type,
+            action: 'BUY',
             time: hasBuySignal.bar.time,
             open: hasBuySignal.bar.open,
             high: hasBuySignal.bar.high,
             low: hasBuySignal.bar.low,
             close: hasBuySignal.bar.close,
             volume: hasBuySignal.bar.volume,
-            exchange: 'UNKNOWN', // TODO: actually set me
             // reasoning
             strategy: 'IncreasingBars',
             signalReasoning: hasBuySignal.signalReasoning!,
