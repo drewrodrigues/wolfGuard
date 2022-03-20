@@ -45,3 +45,4 @@ Technologies used:
 1. Ensure packages are update to date and installed. Run `yarn install` from `/client`, `/server` and from the root `/`.
 2. To run the server, run `yarn start` in `/server`.
 3. To run the client, run `yarn start` in `/client`. Client will have a prompt to use a different port, type `y` (this needs to be fixed later).
+4. Run `yarn styles` from `/client` (this is so tailwind watches files and generates css output files)
