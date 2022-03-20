@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { MetricCard } from '../components/metricCard'
-import { Card } from '../components/shared/card'
 import { useRequest } from '../hooks/request'
 
 export function PredictionsView() {
@@ -47,11 +46,18 @@ export function PredictionsView() {
         />
       </div>
 
+      <h3 className="text-white font-bold mb-[10px]">Performance</h3>
+      <div className="flex mb-[20px] text-white mx-[-5px]">
+        <MetricCard header="Bar Count" metric="7.25%" color="yellow" />
+        <MetricCard header="Bar Count" metric="90238" color="yellow" />
+        <MetricCard header="News Count" metric="0" color="yellow" />
+      </div>
+
       <h3 className="text-white font-bold mb-[10px]">Platform</h3>
       <div className="flex mb-[20px] text-white mx-[-5px]">
-        <MetricCard header="Bar Count" metric="7.25%" color="blue" />
-        <MetricCard header="Bar Count" metric="90238" color="blue" />
-        <MetricCard header="News Count" metric="0" color="blue" />
+        <MetricCard header="Bar Count" metric="7.25%" color="gray" />
+        <MetricCard header="Bar Count" metric="90238" color="gray" />
+        <MetricCard header="News Count" metric="0" color="gray" />
       </div>
 
       <h2 className="text-white font-bold mb-[10px]">Data</h2>

@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import React from 'react'
 
 interface MetricCardProps {
@@ -5,7 +6,7 @@ interface MetricCardProps {
   metric: string | number
 
   symbol?: string
-  color?: 'red' | 'green' | 'blue'
+  color?: 'red' | 'green' | 'blue' | 'yellow' | 'gray'
 }
 
 export function MetricCard({
@@ -16,11 +17,20 @@ export function MetricCard({
 }: MetricCardProps) {
   return (
     <div
-      className={`flex-grow border border-${color}-500 p-[20px] rounded-[5px] mx-[5px] bg-${color}-400`}
+      className={classNames(
+        `flex-grow border p-[20px] rounded-[5px] mx-[5px]`,
+        {
+          'border-red-500 bg-red-400': color === 'red',
+          'border-green-500 bg-green-400': color === 'green',
+          'border-blue-500 bg-blue-400': color === 'blue',
+          'border-yellow-500 bg-yellow-400': color === 'yellow',
+          'border-gray-500 bg-gray-400': color === 'gray'
+        }
+      )}
     >
       <h4 className={`mb-[10px]`}>{header}</h4>
-      <h5 className={`text-[32px] font-bold mb-[10px]`}>{metric}</h5>
-      {symbol && <p className={`text-${color}-500`}>{symbol}</p>}
+      <h5 className={`text-[32px] font-bold`}>{metric}</h5>
+      {symbol && <p className="mt-[10px] text-black opacity-30">{symbol}</p>}
     </div>
   )
 }
