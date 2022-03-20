@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react'
+import { MetricCard } from '../components/metricCard'
+import { Card } from '../components/shared/card'
 import { useRequest } from '../hooks/request'
 
 export function PredictionsView() {
@@ -10,6 +12,49 @@ export function PredictionsView() {
 
   return (
     <>
+      <h2 className="text-white font-bold mb-[10px] text-[32px]">Analytics</h2>
+      <h3 className="text-white font-bold mb-[10px]">Upcoming</h3>
+      <div className="flex mb-[20px] text-white mx-[-5px]">
+        <MetricCard
+          header="Most Positive Mentions Today"
+          metric={72}
+          symbol="MSFT"
+          color="green"
+        />
+
+        <MetricCard
+          header="Most Negative Mentions Today"
+          metric={50}
+          symbol="SNAP"
+          color="red"
+        />
+      </div>
+
+      <h3 className="text-white font-bold mb-[10px]">Historic</h3>
+      <div className="flex mb-[20px] text-white mx-[-5px]">
+        <MetricCard
+          header="Largest Positive Gap"
+          metric="15%"
+          symbol="TSLA"
+          color="blue"
+        />
+
+        <MetricCard
+          header="Largest Day Open to Close"
+          metric="7.25%"
+          symbol="NSAL"
+          color="blue"
+        />
+      </div>
+
+      <h3 className="text-white font-bold mb-[10px]">Platform</h3>
+      <div className="flex mb-[20px] text-white mx-[-5px]">
+        <MetricCard header="Bar Count" metric="7.25%" color="blue" />
+        <MetricCard header="Bar Count" metric="90238" color="blue" />
+        <MetricCard header="News Count" metric="0" color="blue" />
+      </div>
+
+      <h2 className="text-white font-bold mb-[10px]">Data</h2>
       {barsQuery.requestStatus === 'success' && (
         <ul className="flex flex-wrap mr-[-5px]">
           {barsQuery.data.map((data) => (
