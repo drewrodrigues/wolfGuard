@@ -11,9 +11,9 @@ export function PredictionsView() {
   return (
     <>
       {barsQuery.requestStatus === 'success' && (
-        <ul className="flex flex-col">
+        <ul className="flex flex-wrap mr-[-5px]">
           {barsQuery.data.map((data) => (
-            <div className="shadow-md rounded-[3px] mb-[5px] p-[10px] border-collapse flex justify-between items-center bg-[#333] text-white border border-stone-700">
+            <div className="shadow-md rounded-[3px] mb-[5px] mr-[5px] p-[10px] border-collapse flex justify-between items-center bg-[#333] text-white border border-stone-700 w-[125px] flex-grow">
               <span>{data.symbol}</span>
               <span className="text-[12px]">{data.count}</span>
             </div>
