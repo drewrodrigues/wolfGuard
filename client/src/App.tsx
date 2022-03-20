@@ -8,6 +8,10 @@ const ROUTES = [
     path: '/'
   },
   {
+    title: 'Predictions',
+    path: '/predictions'
+  },
+  {
     title: 'Strategy',
     path: '/strategy'
   },

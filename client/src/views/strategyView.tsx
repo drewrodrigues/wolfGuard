@@ -32,7 +32,7 @@ export function StrategyView() {
   const [symbol, setSymbol] = useState<string | undefined>('MSFT')
 
   useEffect(() => {
-    requestSymbols.call('/symbols')
+    requestSymbols.call('/symbols?type=1 min')
     // on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
